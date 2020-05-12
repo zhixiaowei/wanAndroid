@@ -5,6 +5,7 @@ package com.huangxiaowei.wanandroid.client
 import com.alibaba.fastjson.JSON
 import com.huangxiaowei.wanandroid.CatchApplication
 import com.huangxiaowei.wanandroid.data.Preference
+import com.huangxiaowei.wanandroid.data.bean.LoginBean
 import com.huangxiaowei.wanandroid.data.bean.WanReponse
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
@@ -12,6 +13,7 @@ import com.huangxiaowei.wanandroid.showToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okhttp3.FormBody
 import org.json.JSONObject
 
 object RequestCtrl {
@@ -139,6 +141,44 @@ object RequestCtrl {
                     }
                 }
 
+            })
+        }
+    }
+
+    /**
+     * 请求登录
+     */
+    fun requestLogin(userName:String,password:String,callback: (bean:LoginBean?) -> Unit){
+
+        ioScope.launch {
+
+            val form = FormBody.Builder()
+                .add("username",userName)
+                .add("password",password)
+                .build()
+
+            httpClient.doFormPost("$baseUrl/user/login",form,object:HttpClient.OnIRequestResult{
+                override fun onSuccess(json: String) {
+                    val response = JSONObject(json)
+                    val resultCode = response.getInt(JSON_KEY_RESULT)
+
+                    if (REQUEST_SUCCESS == resultCode) {
+                        val data = response.getString(JSON_KEY_DATE)
+                        val bean = JSON.parseObject(data, LoginBean::class.java)
+
+                        uiScope.launch { callback(bean) }//更新UI
+                    } else {
+                        val resultMsg = response.getString(JSON_KEY_RESULT_STRING)
+                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[$resultCode],$resultMsg"),"")
+                    }
+                }
+
+                override fun onError(e: Exception, response: String) {
+                    uiScope.launch {
+                        showToast("登录失败！")
+                        callback(null)
+                    }
+                }
             })
         }
     }
