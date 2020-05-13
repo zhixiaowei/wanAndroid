@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.huangxiaowei.wanandroid.R
+import kotlin.Exception
 
 class FragmentCtrl{
 
@@ -55,11 +56,25 @@ class FragmentCtrl{
 //        }
 
         if (temp == null||!temp.isAdded){
-            temp = list[tag]!!
 
-            fragmentManager.beginTransaction()
-                .add(R.id.fragmentContainer,temp, tag)
-                .commit()
+            try {
+                temp = list[tag]!!
+            }catch (e:Exception){
+                throw Exception("TAG:$tag 找不到相应的Fragment,请确保调用onCreate(),并将相应TAG及Fragment实例加入队列")
+            }
+
+            if (currentFragment == null){
+
+                fragmentManager.beginTransaction()
+                    .add(R.id.fragmentContainer,temp, tag)
+                    .commit()
+
+            }else{
+                fragmentManager.beginTransaction()
+                    .hide(currentFragment!!)
+                    .add(R.id.fragmentContainer,temp, tag)
+                    .commit()
+            }
         }else{
             fragmentManager.beginTransaction()
                 .hide(currentFragment!!)

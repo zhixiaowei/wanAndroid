@@ -1,12 +1,7 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package com.huangxiaowei.wanandroid.client
-
 import com.alibaba.fastjson.JSON
-import com.huangxiaowei.wanandroid.CatchApplication
 import com.huangxiaowei.wanandroid.data.Preference
-import com.huangxiaowei.wanandroid.data.bean.LoginBean
-import com.huangxiaowei.wanandroid.data.bean.WanReponse
+import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
 import com.huangxiaowei.wanandroid.showToast
@@ -25,8 +20,9 @@ object RequestCtrl {
     private const val REQUEST_SUCCESS = 0//当返回JSON的errorCode为0时为请求成功，文档不建议依赖除0以外的其他数字
     private const val baseUrl = "https://www.wanandroid.com"
 
-    private const val KEY_REQUEST_ARTICLE_LIST = "key_request_article_list"//请求文章
-    private const val KEY_REQUEST_BANNER = "key_request_banner"//请求Banner
+    const val KEY_REQUEST_ARTICLE_LIST = "key_request_article_list"//请求文章
+    const val KEY_REQUEST_BANNER = "key_request_banner"//请求Banner
+    const val KEY_REQUEST_LOGIN = "key_request_login"//请求登录
 
     private const val JSON_KEY_RESULT = "errorCode"
     private const val JSON_KEY_RESULT_STRING = "errorMsg"
@@ -148,7 +144,7 @@ object RequestCtrl {
     /**
      * 请求登录
      */
-    fun requestLogin(userName:String,password:String,callback: (bean:LoginBean?) -> Unit){
+    fun requestLogin(userName:String,password:String,callback: (bean:UserBean?) -> Unit){
 
         ioScope.launch {
 
@@ -164,18 +160,22 @@ object RequestCtrl {
 
                     if (REQUEST_SUCCESS == resultCode) {
                         val data = response.getString(JSON_KEY_DATE)
-                        val bean = JSON.parseObject(data, LoginBean::class.java)
+                        val bean = JSON.parseObject(data, UserBean::class.java)
 
                         uiScope.launch { callback(bean) }//更新UI
+
+                        bean.password = password
+
+                        Preference.putValue(KEY_REQUEST_LOGIN,data)
                     } else {
                         val resultMsg = response.getString(JSON_KEY_RESULT_STRING)
-                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[$resultCode],$resultMsg"),"")
+                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[$resultCode],$resultMsg"),resultMsg)
                     }
                 }
 
                 override fun onError(e: Exception, response: String) {
                     uiScope.launch {
-                        showToast("登录失败！")
+                        showToast(response)
                         callback(null)
                     }
                 }

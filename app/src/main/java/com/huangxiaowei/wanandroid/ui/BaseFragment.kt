@@ -11,9 +11,10 @@ import androidx.fragment.app.Fragment
 import com.huangxiaowei.wanandroid.R
 
 abstract class BaseFragment:Fragment(){
-    lateinit var attackActivty:Activity
+    lateinit var attackActivity:Activity
 
     abstract fun getLayout():Int//返回layout的ID
+    abstract fun onCreated(view: View, savedInstanceState: Bundle?)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,11 +24,14 @@ abstract class BaseFragment:Fragment(){
         return inflater.inflate(getLayout(),container,false)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        attackActivty = context as Activity
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        onCreated(view, savedInstanceState)
     }
 
-
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        attackActivity = context as Activity
+    }
 
 }

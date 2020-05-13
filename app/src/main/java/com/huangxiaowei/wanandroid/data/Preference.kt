@@ -3,7 +3,7 @@ package com.huangxiaowei.wanandroid.data
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import com.huangxiaowei.wanandroid.CatchApplication
+import com.huangxiaowei.wanandroid.App
 import java.io.*
 
 /**
@@ -13,7 +13,7 @@ import java.io.*
 object Preference{
 
     private val prefs: SharedPreferences by lazy {
-        CatchApplication.context.getSharedPreferences("AppData", Context.MODE_PRIVATE)
+        App.context.getSharedPreferences("AppData", Context.MODE_PRIVATE)
     }
 
     @SuppressLint("CommitPrefEdits")

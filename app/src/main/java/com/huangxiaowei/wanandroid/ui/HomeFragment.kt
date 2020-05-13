@@ -21,7 +21,7 @@ import com.youth.banner.indicator.CircleIndicator
 import com.youth.banner.util.BannerUtils.dp2px
 import kotlinx.android.synthetic.main.fragment_home.*
 
-class HomeFragment:BaseFragment(){
+class  HomeFragment:BaseFragment(){
 
     override fun getLayout(): Int {
         return R.layout.fragment_home
@@ -33,16 +33,14 @@ class HomeFragment:BaseFragment(){
 
     private var page = 0//文章列表分页
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun onCreated(view: View, savedInstanceState: Bundle?) {
         initView()
 
         //如果本地有，则先获取本地的
         //如果没有，请求网络
         val permissionCtrl = PermissionCtrl()
 
-        permissionCtrl.requestPermission(attackActivty,permission) { isGrant ->
+        permissionCtrl.requestPermission(attackActivity,permission) { isGrant ->
             if (isGrant) {
 
                 updateArticleList()
@@ -53,8 +51,9 @@ class HomeFragment:BaseFragment(){
                 showToast("拒绝权限后，部分功能可能无法正常运行！")
             }
         }
-
     }
+
+
 
     /**
      * 更新Banner
@@ -63,7 +62,7 @@ class HomeFragment:BaseFragment(){
         RequestCtrl.requestBanner {
 
             val adapter = ImageAdapter(
-                attackActivty,
+                attackActivity,
                 it
             )
 
@@ -71,7 +70,7 @@ class HomeFragment:BaseFragment(){
             articleList.addHeaderView(bannerView)
 
             bannerView.setOnBannerListener { data, _ ->
-                WebActivity.startActivity(attackActivty, (data as BannerItem).url)
+                WebActivity.startActivity(attackActivity, (data as BannerItem).url)
             }
         }
     }
@@ -90,7 +89,7 @@ class HomeFragment:BaseFragment(){
                this.page = returnPage
 
                if (articleAdapter == null){
-                   articleAdapter = ArticleListAdapter(attackActivty,bean)
+                   articleAdapter = ArticleListAdapter(attackActivity,bean)
                    articleList.adapter = articleAdapter
                }else if (returnPage == 0){
                    articleAdapter!!.apply {
@@ -119,7 +118,7 @@ class HomeFragment:BaseFragment(){
         bannerView = layoutInflater.inflate(R.layout.banner,null) as Banner<*, *>
 
         bannerView.run {
-            indicator = CircleIndicator(attackActivty)//Banner下方显示N个小圆点
+            indicator = CircleIndicator(attackActivity)//Banner下方显示N个小圆点
             layoutParams = AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
                 ,dp2px(200f).toInt())
         }
@@ -129,7 +128,7 @@ class HomeFragment:BaseFragment(){
             val url = articleAdapter?.getItem(position)?.link
 
             url?.apply {
-                WebActivity.startActivity(attackActivty,url)
+                WebActivity.startActivity(attackActivity,url)
             }
         }
 

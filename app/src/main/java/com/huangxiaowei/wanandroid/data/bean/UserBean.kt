@@ -1,6 +1,6 @@
 package com.huangxiaowei.wanandroid.data.bean
 
-data class LoginBean(
+data class UserBean(
     val admin: Boolean,
     val chapterTops: List<Any>,
     val collectIds: List<Any>,
@@ -8,7 +8,7 @@ data class LoginBean(
     val icon: String,
     val id: Int,
     val nickname: String,
-    val password: String,
+    var password: String,
     val publicName: String,
     val token: String,
     val type: Int,
