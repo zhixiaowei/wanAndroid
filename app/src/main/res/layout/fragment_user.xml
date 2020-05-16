@@ -18,4 +18,27 @@
         android:text="昵称"
         android:textSize="15dp" />
 
+
+    <Button
+        android:id="@+id/collectArticlesBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="已收藏文章"
+        />
+
+
+    <Button
+        android:id="@+id/logoutBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="退出账户"
+        />
+
+    <com.huangxiaowei.wanandroid.ui.view.SuperListView
+        android:id="@+id/articleList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+
 </LinearLayout>

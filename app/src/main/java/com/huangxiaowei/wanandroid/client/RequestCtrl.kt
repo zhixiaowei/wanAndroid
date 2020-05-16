@@ -2,15 +2,15 @@ package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
 import com.huangxiaowei.wanandroid.data.Preference
+import com.huangxiaowei.wanandroid.data.WanReponseAnalyst
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
+import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectActicleListBean
 import com.huangxiaowei.wanandroid.showToast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.FormBody
-import org.json.JSONObject
 
 object RequestCtrl {
 
@@ -18,16 +18,12 @@ object RequestCtrl {
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private val uiScope = CoroutineScope(Dispatchers.Main)
 
-    private const val REQUEST_SUCCESS = 0//当返回JSON的errorCode为0时为请求成功，文档不建议依赖除0以外的其他数字
     private const val baseUrl = "https://www.wanandroid.com"
 
     const val KEY_REQUEST_ARTICLE_LIST = "key_request_article_list"//请求文章
     const val KEY_REQUEST_BANNER = "key_request_banner"//请求Banner
     const val KEY_REQUEST_LOGIN = "key_request_login"//请求登录
-
-    private const val JSON_KEY_RESULT = "errorCode"
-    private const val JSON_KEY_RESULT_STRING = "errorMsg"
-    private const val JSON_KEY_DATE = "data"
+    const val KEY_REQUEST_LOGOUT = "key_request_logout"//请求登出
 
     /**
      * 请求文章列表
@@ -44,12 +40,11 @@ object RequestCtrl {
             httpClient.doGet("${baseUrl}/article/list/${requestPage}/json",object:HttpClient.OnIRequestResult{
 
                 override fun onSuccess(json: String) {
-                    val response = JSONObject(json)
-                    val resultCode = response.getInt(JSON_KEY_RESULT)
+                    val response = WanReponseAnalyst(json)
 
-                    if (REQUEST_SUCCESS == resultCode){
+                    if (response.isSuccess()){
 
-                        val data = response.getString(JSON_KEY_DATE)
+                        val data = response.getData()
                         val bean = JSON.parseObject(data, ArticleListBean::class.java)
 
                         uiScope.launch { callback(requestPage,bean) }//更新UI
@@ -59,9 +54,8 @@ object RequestCtrl {
                             Preference.putValue(localKey,data)
                         }
                     }else{
-                        val resultMsg = response.getString(JSON_KEY_RESULT_STRING)
-
-                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[$resultCode],$resultMsg"),"")
+                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为" +
+                                "[${response.getResultCode()}]," + response.getErrorMsg()),"")
                         return
                     }
                 }
@@ -103,18 +97,18 @@ object RequestCtrl {
         ioScope.launch {
             httpClient.doGet("$baseUrl/banner/json",object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
-                    val response = JSONObject(json)
-                    val resultCode = response.getInt(JSON_KEY_RESULT)
 
-                    if (REQUEST_SUCCESS == resultCode) {
+                    val response = WanReponseAnalyst(json)
+
+                    if (response.isSuccess()) {
                         val bean = JSON.parseObject(json, BannerBean::class.java)
 
                         uiScope.launch { callback(bean) }//更新UI
 
                         Preference.putValue(localKey, json) //可以做一下本地缓存
                     } else {
-                        val resultMsg = response.getString(JSON_KEY_RESULT_STRING)
-                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[$resultCode],$resultMsg"),"")
+                        val resultMsg = response.getErrorMsg()
+                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[${response.getResultCode()}],$resultMsg"),"")
                     }
                 }
 
@@ -155,11 +149,10 @@ object RequestCtrl {
 
             httpClient.doPost("$baseUrl/user/login",form,object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
-                    val response = JSONObject(json)
-                    val resultCode = response.getInt(JSON_KEY_RESULT)
+                    val response = WanReponseAnalyst(json)
 
-                    if (REQUEST_SUCCESS == resultCode) {
-                        val data = response.getString(JSON_KEY_DATE)
+                    if (response.isSuccess()) {
+                        val data = response.getData()
                         val bean = JSON.parseObject(data, UserBean::class.java)
 
                         uiScope.launch { callback(bean) }//更新UI
@@ -168,8 +161,8 @@ object RequestCtrl {
 
                         Preference.putValue(KEY_REQUEST_LOGIN,data)
                     } else {
-                        val resultMsg = response.getString(JSON_KEY_RESULT_STRING)
-                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[$resultCode],$resultMsg"),resultMsg)
+                        val resultMsg = response.getErrorMsg()
+                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[${response.getResultCode()}],$resultMsg"),resultMsg)
                     }
                 }
 
@@ -181,6 +174,89 @@ object RequestCtrl {
                 }
             })
         }
+    }
+
+    fun requestLogout(callback: (result:Boolean) -> Unit){
+
+        ioScope.launch {
+            httpClient.doGet("https://www.wanandroid.com/user/logout/json",object:HttpClient.OnIRequestResult{
+                override fun onError(e: Exception, response: String) {
+                    uiScope.launch {
+                        callback(false)
+                    }
+                }
+
+                override fun onSuccess(json: String) {
+                    val response = WanReponseAnalyst(json)
+
+                    val isOk = response.isSuccess()
+
+                    uiScope.launch {
+                        callback(isOk)
+                    }
+
+                    if (isOk){
+                        cleanErrorTemp(KEY_REQUEST_LOGIN)//清空登签信息
+                    }
+                }
+            })
+        }
+    }
+
+    fun requestCollectArticles(page:Int,callback:(page:Int,reply:CollectActicleListBean)->Unit){
+        ioScope.launch {
+            httpClient.doGet("$baseUrl/lg/collect/list/$page/json",object:HttpClient.OnIRequestResult{
+                override fun onSuccess(json: String) {
+                    val response = WanReponseAnalyst(json)
+
+                    if (response.isSuccess()){
+
+                        val data = response.getData()
+                        val bean = JSON.parseObject(data, CollectActicleListBean::class.java)
+
+                        uiScope.launch { callback(page,bean) }//更新UI
+
+//                        if (page == 0){
+//                            //可以做一下本地缓存
+//                            Preference.putValue(localKey,data)
+//                        }
+                    }else{
+                        uiScope.launch {
+                            showToast(response.getErrorMsg())
+                        }
+                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为" +
+                                "[${response.getResultCode()}]," + response.getErrorMsg()),response.getErrorMsg())
+                        return
+                    }
+                }
+
+                override fun onError(e: Exception, response: String) {
+
+                    e.printStackTrace()
+
+                    //请求服务器返回异常，则加载本地数据
+                    val bean =
+//                        if (hasLocalTemp(localKey)){
+//                        try {
+//                            JSON.parseObject(getLoaclTemp(localKey), ArticleListBean::class.java)
+//                        }catch (e:Exception){
+//                            e.printStackTrace()
+//                            cleanErrorTemp(localKey)
+//                            ArticleListBean()
+//                        }
+//                    }else{
+                        CollectActicleListBean()
+//                    }
+
+                    uiScope.launch {
+//                        showToast("访问服务器失败，请检查网络状态是否正常")
+                        callback(0,bean)
+                    }
+                }
+            })
+        }
+
+
     }
 
     private fun cleanErrorTemp(key: String) {

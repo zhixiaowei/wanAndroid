@@ -2,7 +2,6 @@ package com.huangxiaowei.wanandroid.client.cookie;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
