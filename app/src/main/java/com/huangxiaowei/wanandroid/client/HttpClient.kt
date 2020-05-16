@@ -1,51 +1,38 @@
 package com.huangxiaowei.wanandroid.client
 
+import android.util.ArrayMap
 import android.util.Log
-import com.huangxiaowei.wanandroid.log
+import com.huangxiaowei.wanandroid.client.cookie.SuperCookie
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-
 
 class HttpClient {
 
-    //cookie存储
-    private val cookieStore = ConcurrentHashMap<String, List<Cookie>>()
-
     private val mOkHttpClient = OkHttpClient()
         .newBuilder()
-        .cookieJar(object:CookieJar{
-            override fun loadForRequest(url: HttpUrl): List<Cookie> {
-                val cookies = cookieStore[url.host]
-                return cookies ?: ArrayList()
-            }
-
-            override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
-                cookieStore[url.host] = cookies
-
-                log("cookis-url:${url.host}")
-                for (c in cookies){
-                    log("name ${c.name}:value ${c.value}")
-                }
-            }
-        })
+        .cookieJar(SuperCookie())
         .build()
 
 
     private val mTAG = this.javaClass.canonicalName?:"TAG"
 
-//    fun doJsonPost(uri: String,json:String): Response {
-//        val requests = buildRequest(uri,json)
-//        return mOkHttpClient.newCall(requests).execute()
-//    }
+    fun doPost(uri: String, param: ArrayMap<String, String>, callback:OnIRequestResult){
+        toPost(uri, param,callback)
+    }
 
-    fun doFormPost(uri: String,form:FormBody,callback:OnIRequestResult){
+    fun doPost(uri: String,param: String,callback:OnIRequestResult){
+        toPost(uri, param,callback)
+    }
+
+    private fun toPost(uri: String,data: Any,callback:OnIRequestResult?){
+        val body = buildRequestBody(data)
+            ?: throw Exception("当前Post参数仅支持表单键值对或JSON格式的字符串")
 
         val request = Request.Builder()
             .url(uri)
-            .post(form)
+            .post(body)
             .build()
 
         val call = mOkHttpClient.newCall(request)
@@ -54,38 +41,35 @@ class HttpClient {
             override fun onResponse(call: Call, response: Response) {
 
                 val text = response.body?.string()?:""
-
                 Log.i(mTAG, "获取到POST应答：${text}")
-                callback.onSuccess(text)
+                callback?.onSuccess(text)
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                callback.onError(e,"")
+                callback?.onError(e,"")
             }
 
         })
     }
 
-
-    /**
-     * 构建请求体
-     */
-    private fun buildRequest(uri:String, json:String): Request {
-
-        val body = RequestBody.create(
-            "application/json; charset=GBK".toMediaTypeOrNull(), json)
-
-//        val date = DateUtil.getDate()
-
-        val seq:String = java.lang.String.valueOf(System.currentTimeMillis()/1000)
-
-        return Request.Builder()
-            .url(uri)
-            .addHeader("Connection", "Keep-Alive")
-            .addHeader("Date",Date().toString())
-            .addHeader("X-Seq",seq)
-            .build()
+    private fun buildRequestBody(obj:Any):RequestBody?{
+        return when (obj) {
+            is ArrayMap<*, *> -> {//键值对
+                FormBody.Builder().apply {
+                    for (kv in obj){
+                        add(kv.key as String,kv.value as String)
+                    }
+                }.build()
+            }
+            is String -> {//JSON
+                obj.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+            }
+            else -> {
+                null
+            }
+        }
     }
+
 
     fun doGet(url:String,callback:OnIRequestResult) {
         val builder = Request.Builder()

@@ -1,4 +1,5 @@
 package com.huangxiaowei.wanandroid.client
+import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
 import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.bean.UserBean
@@ -148,12 +149,11 @@ object RequestCtrl {
 
         ioScope.launch {
 
-            val form = FormBody.Builder()
-                .add("username",userName)
-                .add("password",password)
-                .build()
+            val form = ArrayMap<String,String>()
+            form["username"] = userName
+            form["password"] = password
 
-            httpClient.doFormPost("$baseUrl/user/login",form,object:HttpClient.OnIRequestResult{
+            httpClient.doPost("$baseUrl/user/login",form,object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
                     val response = JSONObject(json)
                     val resultCode = response.getInt(JSON_KEY_RESULT)
