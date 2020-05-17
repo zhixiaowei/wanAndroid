@@ -20,9 +20,6 @@ class App:Application(){
     companion object{
         @SuppressLint("StaticFieldLeak")
         lateinit var context:Context
-
-        var isLogin = false
-        var userBean:UserBean? = null
     }
 
     override fun onCreate() {
@@ -31,16 +28,6 @@ class App:Application(){
 
         SpiderMan.init(this)
 
-        if (Preference.contains(RequestCtrl.KEY_REQUEST_LOGIN)){
-            isLogin = true
-            val data = Preference.getValue(RequestCtrl.KEY_REQUEST_LOGIN,"")
-
-            userBean = try {
-                JSON.parseObject(data,UserBean::class.java)
-            }catch (e:Exception){
-                null
-            }
-        }
         this.registerActivityLifecycleCallbacks(object: ActivityLifecycleCallbacks{
             override fun onActivityPaused(activity: Activity) {
 

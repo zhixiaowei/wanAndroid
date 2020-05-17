@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.huangxiaowei.wanandroid.R
-import com.huangxiaowei.wanandroid.data.bean.WanReponse
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerItem
 import com.youth.banner.adapter.BannerAdapter

@@ -5,16 +5,26 @@ import android.util.ArrayMap
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.huangxiaowei.wanandroid.data.LoginStateManager
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.ui.*
 
 class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
+    override fun onLoginInvalid() {
+        App.isLogin = false
+        App.userBean = null
+    }
 
-    override fun onSuccess(user: UserBean) {
+    override fun onLogin(user: UserBean) {
         App.isLogin = true
         App.userBean = user
         fragmentCtrl.showFragment(TAG_USER)
+    }
+
+    override fun onLogout() {
+        App.isLogin = false
+        App.userBean = null
     }
 
     companion object{
@@ -38,6 +48,8 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
 
         fragmentCtrl.onCreate(this ,savedInstanceState
             ,map, TAG_HOME)
+
+        LoginStateManager.addLoginStateListener(this.javaClass.name,this)
     }
 
     override fun onClick(view: View) {

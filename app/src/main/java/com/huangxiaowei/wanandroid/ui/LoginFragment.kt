@@ -30,11 +30,6 @@ class LoginFragment:BaseFragment(){
             RequestCtrl.requestLogin(userName,password){
                 it?.apply {
                     showToast("$publicName 登录成功！")
-
-                    val activity = activity
-                    if (activity is IOnLoginCallback){
-                        activity.onSuccess(it)
-                    }
                 }
             }
         }

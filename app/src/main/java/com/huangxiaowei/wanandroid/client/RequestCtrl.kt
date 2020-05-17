@@ -1,8 +1,9 @@
 package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
+import com.huangxiaowei.wanandroid.data.LoginStateManager
 import com.huangxiaowei.wanandroid.data.Preference
-import com.huangxiaowei.wanandroid.data.WanReponseAnalyst
+import com.huangxiaowei.wanandroid.data.WanResponseAnalyst
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
@@ -22,8 +23,6 @@ object RequestCtrl {
 
     const val KEY_REQUEST_ARTICLE_LIST = "key_request_article_list"//请求文章
     const val KEY_REQUEST_BANNER = "key_request_banner"//请求Banner
-    const val KEY_REQUEST_LOGIN = "key_request_login"//请求登录
-    const val KEY_REQUEST_LOGOUT = "key_request_logout"//请求登出
 
     /**
      * 请求文章列表
@@ -40,7 +39,7 @@ object RequestCtrl {
             httpClient.doGet("${baseUrl}/article/list/${requestPage}/json",object:HttpClient.OnIRequestResult{
 
                 override fun onSuccess(json: String) {
-                    val response = WanReponseAnalyst(json)
+                    val response = WanResponseAnalyst(json)
 
                     if (response.isSuccess()){
 
@@ -67,7 +66,7 @@ object RequestCtrl {
                     //请求服务器返回异常，则加载本地数据
                     val bean = if (hasLocalTemp(localKey)){
                         try {
-                            JSON.parseObject(getLoaclTemp(localKey), ArticleListBean::class.java)
+                            JSON.parseObject(getLocalTemp(localKey), ArticleListBean::class.java)
                         }catch (e:Exception){
                             e.printStackTrace()
                             cleanErrorTemp(localKey)
@@ -98,7 +97,7 @@ object RequestCtrl {
             httpClient.doGet("$baseUrl/banner/json",object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
 
-                    val response = WanReponseAnalyst(json)
+                    val response = WanResponseAnalyst(json)
 
                     if (response.isSuccess()) {
                         val bean = JSON.parseObject(json, BannerBean::class.java)
@@ -117,7 +116,7 @@ object RequestCtrl {
                     //请求服务器返回异常，则加载本地数据
                     val bean = if (hasLocalTemp(localKey)){
                         try {
-                            JSON.parseObject(getLoaclTemp(localKey), BannerBean::class.java)
+                            JSON.parseObject(getLocalTemp(localKey), BannerBean::class.java)
                         }catch (e:Exception){
                             e.printStackTrace()
                             BannerBean()
@@ -149,7 +148,7 @@ object RequestCtrl {
 
             httpClient.doPost("$baseUrl/user/login",form,object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
-                    val response = WanReponseAnalyst(json)
+                    val response = WanResponseAnalyst(json)
 
                     if (response.isSuccess()) {
                         val data = response.getData()
@@ -159,7 +158,7 @@ object RequestCtrl {
 
                         bean.password = password
 
-                        Preference.putValue(KEY_REQUEST_LOGIN,data)
+                        LoginStateManager.login(data,bean)
                     } else {
                         val resultMsg = response.getErrorMsg()
                         onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[${response.getResultCode()}],$resultMsg"),resultMsg)
@@ -176,6 +175,9 @@ object RequestCtrl {
         }
     }
 
+    /**
+     * 请求登出
+     */
     fun requestLogout(callback: (result:Boolean) -> Unit){
 
         ioScope.launch {
@@ -187,46 +189,48 @@ object RequestCtrl {
                 }
 
                 override fun onSuccess(json: String) {
-                    val response = WanReponseAnalyst(json)
+                    val response = WanResponseAnalyst(json)
 
-                    val isOk = response.isSuccess()
+                    val isOk = response.isSuccess()||response.isLoginInvalid()
 
                     uiScope.launch {
                         callback(isOk)
-                    }
 
-                    if (isOk){
-                        cleanErrorTemp(KEY_REQUEST_LOGIN)//清空登签信息
+                        if (isOk){
+                            LoginStateManager.logout()
+                        }
                     }
                 }
             })
         }
     }
 
-    fun requestCollectArticles(page:Int,callback:(page:Int,reply:CollectActicleListBean)->Unit){
+    /**
+     * 请求收藏的文章
+     */
+    fun requestCollectArticles(page:Int,callback:(isLoginInvalid:Boolean,page:Int,reply:CollectActicleListBean)->Unit){
         ioScope.launch {
             httpClient.doGet("$baseUrl/lg/collect/list/$page/json",object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
-                    val response = WanReponseAnalyst(json)
+                    val response = WanResponseAnalyst(json)
 
-                    if (response.isSuccess()){
+                    when {
+                        response.isSuccess() -> {
+                            val data = response.getData()
+                            val bean = JSON.parseObject(data, CollectActicleListBean::class.java)
 
-                        val data = response.getData()
-                        val bean = JSON.parseObject(data, CollectActicleListBean::class.java)
-
-                        uiScope.launch { callback(page,bean) }//更新UI
-
-//                        if (page == 0){
-//                            //可以做一下本地缓存
-//                            Preference.putValue(localKey,data)
-//                        }
-                    }else{
-                        uiScope.launch {
-                            showToast(response.getErrorMsg())
+                            uiScope.launch { callback(true,page,bean) }//更新UI
                         }
-                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为" +
-                                "[${response.getResultCode()}]," + response.getErrorMsg()),response.getErrorMsg())
-                        return
+                        response.isLoginInvalid() -> {
+                            LoginStateManager.loginInvalid()
+                            uiScope.launch { callback(false,page,CollectActicleListBean()) }
+                        }
+                        else -> {
+                            uiScope.launch { showToast(response.getErrorMsg()) }
+                            onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为" +
+                                    "[${response.getResultCode()}]," + response.getErrorMsg()),response.getErrorMsg())
+                            return
+                        }
                     }
                 }
 
@@ -235,28 +239,15 @@ object RequestCtrl {
                     e.printStackTrace()
 
                     //请求服务器返回异常，则加载本地数据
-                    val bean =
-//                        if (hasLocalTemp(localKey)){
-//                        try {
-//                            JSON.parseObject(getLoaclTemp(localKey), ArticleListBean::class.java)
-//                        }catch (e:Exception){
-//                            e.printStackTrace()
-//                            cleanErrorTemp(localKey)
-//                            ArticleListBean()
-//                        }
-//                    }else{
-                        CollectActicleListBean()
-//                    }
+                    val bean = CollectActicleListBean()
 
                     uiScope.launch {
 //                        showToast("访问服务器失败，请检查网络状态是否正常")
-                        callback(0,bean)
+                        callback(true,0,bean)
                     }
                 }
             })
         }
-
-
     }
 
     private fun cleanErrorTemp(key: String) {
@@ -270,7 +261,7 @@ object RequestCtrl {
         return Preference.contains(key)
     }
 
-    private fun getLoaclTemp(key: String):String{
+    private fun getLocalTemp(key: String):String{
         return Preference.getValue(key,"")
     }
 }
