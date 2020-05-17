@@ -2,7 +2,6 @@ package com.huangxiaowei.wanandroid.ui
 
 import android.os.Bundle
 import android.view.View
-import com.huangxiaowei.wanandroid.App
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.adaptor.CollectArticleListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
@@ -34,7 +33,12 @@ class UserFragment:BaseFragment(),View.OnClickListener,IOnLoginCallback{
         collectArticlesBtn.setOnClickListener(this)
         logoutBtn.setOnClickListener(this)
 
-        LoginStateManager.addLoginStateListener(this.javaClass.name,this)
+        LoginStateManager.addLoginStateListener(true,this.javaClass.name,this)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        LoginStateManager.removeLoginStateListener(this.javaClass.name)
     }
 
     override fun onClick(v: View) {
@@ -65,8 +69,6 @@ class UserFragment:BaseFragment(),View.OnClickListener,IOnLoginCallback{
             R.id.logoutBtn->{
                 RequestCtrl.requestLogout {
                     if (it){
-                        App.isLogin = false
-                        App.userBean = null
                         userName.text = ""
                     }
                 }

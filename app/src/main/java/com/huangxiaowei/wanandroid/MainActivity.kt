@@ -12,19 +12,14 @@ import com.huangxiaowei.wanandroid.ui.*
 
 class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
     override fun onLoginInvalid() {
-        App.isLogin = false
-        App.userBean = null
     }
 
     override fun onLogin(user: UserBean) {
-        App.isLogin = true
-        App.userBean = user
+        //登签成功，进入个人信息页面
         fragmentCtrl.showFragment(TAG_USER)
     }
 
     override fun onLogout() {
-        App.isLogin = false
-        App.userBean = null
     }
 
     companion object{
@@ -49,7 +44,7 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
         fragmentCtrl.onCreate(this ,savedInstanceState
             ,map, TAG_HOME)
 
-        LoginStateManager.addLoginStateListener(this.javaClass.name,this)
+        LoginStateManager.addLoginStateListener(false,this.javaClass.name,this)
     }
 
     override fun onClick(view: View) {
@@ -59,7 +54,7 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
             R.id.main_weChat->
                 fragmentCtrl.showFragment(TAG_WE_CHAT)
             R.id.main_user->
-                if (App.isLogin){
+                if (LoginStateManager.isLogin){
                     fragmentCtrl.showFragment(TAG_USER)
                 }else{
                     fragmentCtrl.showFragment(TAG_LOGIN)
