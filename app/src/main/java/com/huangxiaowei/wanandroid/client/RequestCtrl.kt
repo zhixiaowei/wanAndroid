@@ -219,11 +219,11 @@ object RequestCtrl {
                             val data = response.getData()
                             val bean = JSON.parseObject(data, CollectActicleListBean::class.java)
 
-                            uiScope.launch { callback(true,page,bean) }//更新UI
+                            uiScope.launch { callback(false,page,bean) }//更新UI
                         }
                         response.isLoginInvalid() -> {
                             LoginStateManager.loginInvalid()
-                            uiScope.launch { callback(false,page,CollectActicleListBean()) }
+                            uiScope.launch { callback(true,page,CollectActicleListBean()) }
                         }
                         else -> {
                             uiScope.launch { showToast(response.getErrorMsg()) }

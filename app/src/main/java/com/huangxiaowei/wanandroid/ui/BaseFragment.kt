@@ -7,11 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.huangxiaowei.wanandroid.R
 
 abstract class BaseFragment:Fragment(){
-    lateinit var attackActivity:Activity
+    lateinit var attackActivity: AppCompatActivity
 
     abstract fun getLayout():Int//返回layout的ID
     abstract fun onCreated(view: View, savedInstanceState: Bundle?)
@@ -31,7 +32,7 @@ abstract class BaseFragment:Fragment(){
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        attackActivity = context as Activity
+        attackActivity = context as AppCompatActivity
     }
 
 }

@@ -6,7 +6,9 @@ import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.showToast
+import com.huangxiaowei.wanandroid.utils.SoftKeyboardUtils
 import kotlinx.android.synthetic.main.fragment_login.*
+import kotlinx.android.synthetic.main.fragment_user.*
 
 class LoginFragment:BaseFragment(){
 
@@ -16,6 +18,8 @@ class LoginFragment:BaseFragment(){
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
         loginBtn.setOnClickListener {
+
+            SoftKeyboardUtils.hideSoftKeyboard(attackActivity)
 
             val userName = inputUserNameText.text.toString()
             if (userName.isBlank()){
@@ -33,5 +37,6 @@ class LoginFragment:BaseFragment(){
                 }
             }
         }
+
     }
 }

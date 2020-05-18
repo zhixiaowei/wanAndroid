@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+    </FrameLayout>
+
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -18,12 +26,37 @@
         android:text="昵称"
         android:textSize="15dp" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="积分：0"
+        />
+
 
     <Button
         android:id="@+id/collectArticlesBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="已收藏文章"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TODO"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="夜间模式"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="设置"
         />
 
 
@@ -33,11 +66,6 @@
         android:layout_height="wrap_content"
         android:text="退出账户"
         />
-
-    <com.huangxiaowei.wanandroid.ui.view.SuperListView
-        android:id="@+id/articleList"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
 
 

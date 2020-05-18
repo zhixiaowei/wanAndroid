@@ -12,6 +12,7 @@ import com.huangxiaowei.wanandroid.ui.*
 
 class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
     override fun onLoginInvalid() {
+        fragmentCtrl.showFragment(TAG_LOGIN)
     }
 
     override fun onLogin(user: UserBean) {

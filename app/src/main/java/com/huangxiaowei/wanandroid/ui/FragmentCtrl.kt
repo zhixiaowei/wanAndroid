@@ -26,13 +26,39 @@ class FragmentCtrl{
     fun onCreate(activity: AppCompatActivity
                  ,savedInstanceState: Bundle?
                  ,list:ArrayMap<String,Fragment>//Fragment及对应的TAG
-                 ,default:String//默认显示的Fragment的TAG
+                 ,default:String?//默认显示的Fragment的TAG
                  ){
 
         fragmentManager = activity.supportFragmentManager
         this.list = list
 
-        if (savedInstanceState == null) {
+        if (default == null){
+
+        }else if (savedInstanceState == null) {
+            showFragment(default)
+        }else{
+            val tag = savedInstanceState.getString(KEY_TAG)?:default
+            currentFragment = fragmentManager.findFragmentByTag(tag)
+        }
+    }
+
+    /**
+     * 在Activity的onCreate方法中调用该方法
+     * [list]为当前Activity需要显示的所有Fragment的实例及对应的TAG
+     * [default]为Activity默认显示的Fragment的TAG
+     */
+    fun onCreate(activity: Fragment
+                 ,savedInstanceState: Bundle?
+                 ,list:ArrayMap<String,Fragment>//Fragment及对应的TAG
+                 ,default:String?//默认显示的Fragment的TAG
+    ){
+
+        fragmentManager = activity.childFragmentManager
+        this.list = list
+
+        if (default == null){
+
+        }else if (savedInstanceState == null) {
             showFragment(default)
         }else{
             val tag = savedInstanceState.getString(KEY_TAG)?:default
@@ -48,12 +74,6 @@ class FragmentCtrl{
 
         var temp = fragmentManager.findFragmentByTag(tag)
         //通过TAG从Fragment队列中获取
-
-//        when {
-//            temp == null -> showToast(tag+"为空")
-//            temp.isAdded -> showToast(tag+"已加入")
-//            else -> showToast(tag+"未加入")
-//        }
 
         if (temp == null||!temp.isAdded){
 
