@@ -1,7 +1,7 @@
 package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
-import com.huangxiaowei.wanandroid.data.LoginStateManager
+import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.WanResponseAnalyst
 import com.huangxiaowei.wanandroid.data.bean.UserBean

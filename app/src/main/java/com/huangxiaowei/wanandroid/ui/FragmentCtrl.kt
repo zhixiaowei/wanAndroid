@@ -30,35 +30,29 @@ class FragmentCtrl{
                  ){
 
         fragmentManager = activity.supportFragmentManager
-        this.list = list
-
-        if (default == null){
-
-        }else if (savedInstanceState == null) {
-            showFragment(default)
-        }else{
-            val tag = savedInstanceState.getString(KEY_TAG)?:default
-            currentFragment = fragmentManager.findFragmentByTag(tag)
-        }
+        onCreate(savedInstanceState,list,default)
     }
 
     /**
-     * 在Activity的onCreate方法中调用该方法
+     * 在Fragment的onCreated方法中调用该方法
      * [list]为当前Activity需要显示的所有Fragment的实例及对应的TAG
      * [default]为Activity默认显示的Fragment的TAG
      */
-    fun onCreate(activity: Fragment
+    fun onCreate(fragment: Fragment
                  ,savedInstanceState: Bundle?
                  ,list:ArrayMap<String,Fragment>//Fragment及对应的TAG
                  ,default:String?//默认显示的Fragment的TAG
-    ){
+                 ){
+        fragmentManager = fragment.childFragmentManager
+        onCreate(savedInstanceState,list,default)
+    }
 
-        fragmentManager = activity.childFragmentManager
+    private fun onCreate(savedInstanceState: Bundle?, list: ArrayMap<String, Fragment>, default: String?) {
         this.list = list
 
-        if (default == null){
+        default?:return
 
-        }else if (savedInstanceState == null) {
+        if (savedInstanceState == null) {
             showFragment(default)
         }else{
             val tag = savedInstanceState.getString(KEY_TAG)?:default
@@ -83,6 +77,7 @@ class FragmentCtrl{
                 throw Exception("TAG:$tag 找不到相应的Fragment,请确保调用onCreate(),并将相应TAG及Fragment实例加入队列")
             }
 
+
             if (currentFragment == null){
 
                 fragmentManager.beginTransaction()
@@ -103,6 +98,10 @@ class FragmentCtrl{
         }
 
         currentFragment = temp
+    }
+
+    fun getCurrentFragment():Fragment?{
+        return currentFragment
     }
 
     /**

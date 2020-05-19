@@ -3,6 +3,7 @@ package com.huangxiaowei.wanandroid.ui.userFragment
 import android.os.Bundle
 import android.view.View
 import com.huangxiaowei.wanandroid.R
+import com.huangxiaowei.wanandroid.WebActivity
 import com.huangxiaowei.wanandroid.adaptor.CollectArticleListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectActicleListBean
@@ -14,6 +15,7 @@ class CollectArticlesFragment: BaseFragment() {
     private var articleAdapter: CollectArticleListAdapter?= null
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
+
         RequestCtrl.requestCollectArticles(0){
                 isLoginInvalid:Boolean,
                 returnPage:Int,
@@ -33,6 +35,13 @@ class CollectArticlesFragment: BaseFragment() {
                 }
             }else {
                 articleAdapter!!.addList(bean)
+            }
+        }
+
+        articleList.setOnItemClickListener { parent, view, position, id ->
+            articleAdapter?.apply {
+                val url = getItem(position).link
+                WebActivity.startActivity(attackActivity,url)
             }
         }
     }

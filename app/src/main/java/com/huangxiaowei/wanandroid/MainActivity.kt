@@ -5,10 +5,12 @@ import android.util.ArrayMap
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.huangxiaowei.wanandroid.data.LoginStateManager
+import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
+import com.huangxiaowei.wanandroid.globalStatus.KeyEventManager
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.ui.*
+import java.util.*
 
 class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
     override fun onLoginInvalid() {
@@ -61,9 +63,14 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
                     fragmentCtrl.showFragment(TAG_LOGIN)
                 }
         }
-
     }
 
+    override fun onBackPressed() {
+        //如果未消耗该事件，那么不执行默认
+        if (!KeyEventManager.onBackPress()){
+            super.onBackPressed()
+        }
+    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         fragmentCtrl.onSaveInstanceState(outState)

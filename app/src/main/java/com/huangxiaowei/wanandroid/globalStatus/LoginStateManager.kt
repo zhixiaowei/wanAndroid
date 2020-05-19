@@ -1,7 +1,8 @@
-package com.huangxiaowei.wanandroid.data
+package com.huangxiaowei.wanandroid.globalStatus
 
 import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
+import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 
@@ -15,7 +16,10 @@ object LoginStateManager{
 
     var isLogin = false
     var user:UserBean? = if (Preference.contains(KEY_LOGIN_USER)) {
-        val json = Preference.getValue(KEY_LOGIN_USER, "")
+        val json = Preference.getValue(
+            KEY_LOGIN_USER,
+            ""
+        )
         if (json.isBlank()) {
             Preference.clearPreference(KEY_LOGIN_USER)
             null
@@ -60,7 +64,10 @@ object LoginStateManager{
         for (callback in loginStateListenerList.values){
             callback.onLogin(userBean)
         }
-        Preference.putValue(KEY_LOGIN_USER,json)
+        Preference.putValue(
+            KEY_LOGIN_USER,
+            json
+        )
     }
 
     /**

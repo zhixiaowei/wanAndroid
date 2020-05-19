@@ -1,8 +1,8 @@
 package com.huangxiaowei.wanandroid.data
 
 import org.json.JSONObject
-import com.huangxiaowei.wanandroid.ktExpand.getInt
-import com.huangxiaowei.wanandroid.ktExpand.getString
+import com.huangxiaowei.wanandroid.expand.getInt
+import com.huangxiaowei.wanandroid.expand.getString
 
 class WanResponseAnalyst(json:String){
 
