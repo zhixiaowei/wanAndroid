@@ -1,10 +1,18 @@
 package com.huangxiaowei.wanandroid.data
 
+import com.alibaba.fastjson.JSON
 import org.json.JSONObject
 import com.huangxiaowei.wanandroid.expand.getInt
 import com.huangxiaowei.wanandroid.expand.getString
+import com.huangxiaowei.wanandroid.data.bean.coinCount.CoinCountBean
+import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.CoinCountDetailsBean
+import com.huangxiaowei.wanandroid.data.bean.UserBean
+import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
+import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
+import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectActicleListBean
 
-class WanResponseAnalyst(json:String){
+@Suppress("UNCHECKED_CAST")
+class WanResponseAnalyst(private val json:String){
 
     companion object{
         private const val JSON_KEY_RESULT = "errorCode"
@@ -32,5 +40,18 @@ class WanResponseAnalyst(json:String){
        return getResultCode() == REQUEST_CODE_LOGIN_INVALID
     }
 
+    fun <T> parseObject(clazz:Class<T>):T?{
+        return when (clazz) {
+            CoinCountBean::class.java,
+            CoinCountDetailsBean::class.java,
+            UserBean::class.java,
+            CollectActicleListBean::class.java,
+            ArticleListBean::class.java
+                -> JSON.parseObject(getData(),clazz) as T
+            BannerBean::class.java
+                -> JSON.parseObject(json,clazz) as T
+            else -> null
+        }
+    }
 
 }

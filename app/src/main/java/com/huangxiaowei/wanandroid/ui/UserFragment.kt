@@ -8,7 +8,9 @@ import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.globalStatus.KeyEventManager
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
+import com.huangxiaowei.wanandroid.ui.userFragment.CoinCountDetailsFragment
 import com.huangxiaowei.wanandroid.ui.userFragment.CollectArticlesFragment
+import com.huangxiaowei.wanandroid.ui.userFragment.TODOFragment
 import com.huangxiaowei.wanandroid.ui.userFragment.UserMainFragment
 
 class UserFragment:BaseFragment(),View.OnClickListener{
@@ -18,6 +20,7 @@ class UserFragment:BaseFragment(),View.OnClickListener{
     private val KEY_USER = "KEY_USER"//用户
     private val KEY_COLLECT = "KEY_COLLECT"//收藏文章
     private val KEY_TODO = "KEY_TODO"
+    private val KEY_COIN_DETAILS = "KEY_COIN_DETAILS"
 
     override fun getLayout(): Int {
         return R.layout.fragment_user
@@ -27,6 +30,8 @@ class UserFragment:BaseFragment(),View.OnClickListener{
         val list = ArrayMap<String,Fragment>()
         list[KEY_USER] = UserMainFragment(this)
         list[KEY_COLLECT] = CollectArticlesFragment()
+        list[KEY_TODO] = TODOFragment()
+        list[KEY_COIN_DETAILS] = CoinCountDetailsFragment()
 
         fragmentCtrl.onCreate(this,savedInstanceState,list,KEY_USER)
     }
@@ -53,6 +58,9 @@ class UserFragment:BaseFragment(),View.OnClickListener{
 
     override fun onClick(v: View) {
         when(v.id){
+            R.id.coinCount ->{
+                fragmentCtrl.showFragment(KEY_COIN_DETAILS)
+            }
             R.id.collectArticlesBtn->{//请求文章
                 fragmentCtrl.showFragment(KEY_COLLECT)
             }
@@ -60,7 +68,7 @@ class UserFragment:BaseFragment(),View.OnClickListener{
                 RequestCtrl.requestLogout {}//请求退出账户
             }
             R.id.todo->{
-
+                fragmentCtrl.showFragment(KEY_TODO)
             }
             R.id.nightMode->{
 

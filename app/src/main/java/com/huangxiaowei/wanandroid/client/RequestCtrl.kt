@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.WanResponseAnalyst
+import com.huangxiaowei.wanandroid.data.bean.coinCount.CoinCountBean
+import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.CoinCountDetailsBean
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
@@ -44,7 +46,7 @@ object RequestCtrl {
                     if (response.isSuccess()){
 
                         val data = response.getData()
-                        val bean = JSON.parseObject(data, ArticleListBean::class.java)
+                        val bean = response.parseObject(ArticleListBean::class.java)!!
 
                         uiScope.launch { callback(requestPage,bean) }//更新UI
 
@@ -152,8 +154,7 @@ object RequestCtrl {
 
                     if (response.isSuccess()) {
                         val data = response.getData()
-                        val bean = JSON.parseObject(data, UserBean::class.java)
-
+                        val bean = response.parseObject(UserBean::class.java)!!
                         uiScope.launch { callback(bean) }//更新UI
 
                         bean.password = password
@@ -216,9 +217,8 @@ object RequestCtrl {
 
                     when {
                         response.isSuccess() -> {
-                            val data = response.getData()
-                            val bean = JSON.parseObject(data, CollectActicleListBean::class.java)
 
+                            val bean = response.parseObject(CollectActicleListBean::class.java)!!
                             uiScope.launch { callback(false,page,bean) }//更新UI
                         }
                         response.isLoginInvalid() -> {
@@ -248,6 +248,72 @@ object RequestCtrl {
                 }
             })
         }
+    }
+
+    /**
+     * 获取个人积分（需登录）
+     */
+    fun requestCoinCount(callback: (bean: CoinCountBean?) -> Unit){
+        val url = "$baseUrl/lg/coin/userinfo/json"
+
+        httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+            override fun onError(e: Exception, response: String) {
+                //请求失败，检查网络
+                e.printStackTrace()
+                uiScope.launch {
+                    callback(null)
+                }
+            }
+
+            override fun onSuccess(json: String) {
+                val response = WanResponseAnalyst(json)
+                when {
+                    response.isSuccess() -> uiScope.launch { callback(response.parseObject(CoinCountBean::class.java)) }
+                    response.isLoginInvalid() -> LoginStateManager.loginInvalid()
+                    else -> {
+                        //请求失败
+                        uiScope.launch {
+                            callback(null)
+                        }
+
+                    }
+                }
+            }
+        })
+    }
+
+    fun requestCoinCountDetails(callback:(bean:CoinCountDetailsBean?)->Unit){
+        val url = "$baseUrl/lg/coin/userinfo/json"
+        httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+            override fun onError(e: Exception, response: String) {
+
+            }
+
+            override fun onSuccess(json: String) {
+                val reply = WanResponseAnalyst(json)
+                if (reply.isSuccess()){
+                    callback(reply.parseObject(CoinCountDetailsBean::class.java)!!)
+                }else if (reply.isLoginInvalid()){
+                    LoginStateManager.loginInvalid()
+                }else{
+
+                }
+
+            }
+        })
+    }
+
+
+    fun addTODO(){
+
+    }
+
+    fun queryTODO(){
+
+    }
+
+    fun deleteTODO(){
+
     }
 
     private fun cleanErrorTemp(key: String) {
