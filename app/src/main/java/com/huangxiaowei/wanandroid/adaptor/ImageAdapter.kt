@@ -13,7 +13,7 @@ import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerItem
 import com.youth.banner.adapter.BannerAdapter
 
-    class ImageAdapter(private val context: Context, bean: BannerBean) :
+class ImageAdapter(private val context: Context, bean: BannerBean) :
     BannerAdapter<BannerItem, ImageAdapter.BannerViewHolder>(bean.data) {
 
     private var mLayoutInflater: LayoutInflater = LayoutInflater.from(context)

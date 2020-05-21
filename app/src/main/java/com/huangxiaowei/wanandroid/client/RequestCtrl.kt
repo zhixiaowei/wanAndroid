@@ -283,7 +283,7 @@ object RequestCtrl {
     }
 
     fun requestCoinCountDetails(callback:(bean:CoinCountDetailsBean?)->Unit){
-        val url = "$baseUrl/lg/coin/userinfo/json"
+        val url = "$baseUrl//lg/coin/list/1/json"
         httpClient.doGet(url,object:HttpClient.OnIRequestResult{
             override fun onError(e: Exception, response: String) {
 
@@ -291,14 +291,16 @@ object RequestCtrl {
 
             override fun onSuccess(json: String) {
                 val reply = WanResponseAnalyst(json)
-                if (reply.isSuccess()){
-                    callback(reply.parseObject(CoinCountDetailsBean::class.java)!!)
-                }else if (reply.isLoginInvalid()){
-                    LoginStateManager.loginInvalid()
-                }else{
 
+                uiScope.launch {
+                    if (reply.isSuccess()){
+                        callback(reply.parseObject(CoinCountDetailsBean::class.java))
+                    }else if (reply.isLoginInvalid()){
+                        LoginStateManager.loginInvalid()
+                    }else{
+
+                    }
                 }
-
             }
         })
     }

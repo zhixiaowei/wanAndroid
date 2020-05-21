@@ -8,6 +8,7 @@ import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.globalStatus.KeyEventManager
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
+import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.ui.userFragment.CoinCountDetailsFragment
 import com.huangxiaowei.wanandroid.ui.userFragment.CollectArticlesFragment
 import com.huangxiaowei.wanandroid.ui.userFragment.TODOFragment
@@ -59,6 +60,7 @@ class UserFragment:BaseFragment(),View.OnClickListener{
     override fun onClick(v: View) {
         when(v.id){
             R.id.coinCount ->{
+                showToast("积分信息")
                 fragmentCtrl.showFragment(KEY_COIN_DETAILS)
             }
             R.id.collectArticlesBtn->{//请求文章
