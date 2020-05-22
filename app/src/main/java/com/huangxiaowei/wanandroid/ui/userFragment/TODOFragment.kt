@@ -3,6 +3,7 @@ package com.huangxiaowei.wanandroid.ui.userFragment
 import android.os.Bundle
 import android.view.View
 import com.huangxiaowei.wanandroid.R
+import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.ui.BaseFragment
 
 class TODOFragment :BaseFragment() {
@@ -11,5 +12,8 @@ class TODOFragment :BaseFragment() {
     }
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
+        RequestCtrl.TODO.query(0){
+
+        }
     }
 }

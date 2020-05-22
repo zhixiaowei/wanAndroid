@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON
 import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
+import kotlinx.coroutines.launch
 
 /**
  * 对登签状态进行统一管理
@@ -61,9 +62,13 @@ object LoginStateManager{
     fun login(json:String,userBean: UserBean){
         isLogin = true
         user = userBean
-        for (callback in loginStateListenerList.values){
-            callback.onLogin(userBean)
+
+        uiScope.launch {
+            for (callback in loginStateListenerList.values){
+                callback.onLogin(userBean)
+            }
         }
+
         Preference.putValue(
             KEY_LOGIN_USER,
             json
@@ -77,8 +82,10 @@ object LoginStateManager{
         isLogin = false
         user = null
 
-        for (callback in loginStateListenerList.values){
-            callback.onLogout()
+        uiScope.launch {
+            for (callback in loginStateListenerList.values){
+                callback.onLogout()
+            }
         }
 
         cleanLoginLocalTemp()
@@ -91,8 +98,11 @@ object LoginStateManager{
         isLogin = false
         user = null
         cleanLoginLocalTemp()
-        for (callback in loginStateListenerList.values){
-            callback.onLoginInvalid()
+
+        uiScope.launch {
+            for (callback in loginStateListenerList.values){
+                callback.onLoginInvalid()
+            }
         }
     }
 

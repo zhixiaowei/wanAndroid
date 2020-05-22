@@ -1,30 +1,31 @@
 package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
-import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.WanResponseAnalyst
-import com.huangxiaowei.wanandroid.data.bean.coinCount.CoinCountBean
-import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.CoinCountDetailsBean
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
+import com.huangxiaowei.wanandroid.data.bean.coinCount.CoinCountBean
+import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.CoinCountDetailsBean
 import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectActicleListBean
+import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
+import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
+import com.huangxiaowei.wanandroid.globalStatus.ioScope
+import com.huangxiaowei.wanandroid.globalStatus.uiScope
+import com.huangxiaowei.wanandroid.log
 import com.huangxiaowei.wanandroid.showToast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object RequestCtrl {
 
     private val httpClient = HttpClient()
-    private val ioScope = CoroutineScope(Dispatchers.IO)
-    private val uiScope = CoroutineScope(Dispatchers.Main)
 
     private const val baseUrl = "https://www.wanandroid.com"
 
     const val KEY_REQUEST_ARTICLE_LIST = "key_request_article_list"//请求文章
     const val KEY_REQUEST_BANNER = "key_request_banner"//请求Banner
+    const val KEY_REQUEST_COIN ="key_request_coin"//请求最新积分
 
     /**
      * 请求文章列表
@@ -256,6 +257,15 @@ object RequestCtrl {
     fun requestCoinCount(callback: (bean: CoinCountBean?) -> Unit){
         val url = "$baseUrl/lg/coin/userinfo/json"
 
+        KEY_REQUEST_COIN.let {
+            if (Preference.contains(it)){
+                val json = Preference.getValue(it,"")
+                if (json.isNotBlank()){
+                    callback(JSON.parseObject(json,CoinCountBean::class.java))
+                }
+            }
+        }
+
         httpClient.doGet(url,object:HttpClient.OnIRequestResult{
             override fun onError(e: Exception, response: String) {
                 //请求失败，检查网络
@@ -268,7 +278,10 @@ object RequestCtrl {
             override fun onSuccess(json: String) {
                 val response = WanResponseAnalyst(json)
                 when {
-                    response.isSuccess() -> uiScope.launch { callback(response.parseObject(CoinCountBean::class.java)) }
+                    response.isSuccess() -> {
+                        uiScope.launch { callback(response.parseObject(CoinCountBean::class.java)) }
+                        Preference.putValue(KEY_REQUEST_COIN,response.getData())
+                    }
                     response.isLoginInvalid() -> LoginStateManager.loginInvalid()
                     else -> {
                         //请求失败
@@ -282,6 +295,9 @@ object RequestCtrl {
         })
     }
 
+    /**
+     * 获取积分详情
+     */
     fun requestCoinCountDetails(callback:(bean:CoinCountDetailsBean?)->Unit){
         val url = "$baseUrl//lg/coin/list/1/json"
         httpClient.doGet(url,object:HttpClient.OnIRequestResult{
@@ -306,17 +322,125 @@ object RequestCtrl {
     }
 
 
-    fun addTODO(){
 
+    object TODO{
+        const val ORDER_FINISH_DATE_POSITIVE = 1//完成日期顺序
+        const val ORDER_FINISH_DATE_INVERTED = 2//完成日期逆序
+        const val ORDER_CREATE_DATE_POSITIVE = 3//创建日期顺序
+        const val ORDER_CREATE_DATE_INVERTED = 4//创建日期逆序
+
+        const val STATUS_TO_UNFINISH = 0//从完成到未完成
+        const val STATUS_TO_FINISH = 1//从未完成到完成
+
+        fun add(title:String,context:String,date:String,type:Int = 1,priority:Int = 1){
+            val url = "$baseUrl/lg/todo/add/json"
+
+            val from = ArrayMap<String,String>()
+            from["title"] = title
+            from["content"] = context
+            from["date"] = date
+            from["type"] = type.toString()
+            from["priority"] = priority.toString()
+
+            httpClient.doPost(url,from,object:HttpClient.OnIRequestResult{
+                override fun onError(e: Exception, response: String) {
+
+                }
+
+                override fun onSuccess(json: String) {
+
+                }
+            })
+
+        }
+
+        fun query(page:Int,orderBy:Int = ORDER_CREATE_DATE_POSITIVE
+                  ,status:Int? = null,type:Int? = null,priority:Int? = null
+                  ,callback: (bean: QueryTodoBean?) -> Unit){
+
+            val url = "$baseUrl/lg/todo/v2/list/$page/json"
+
+            val from = ArrayMap<String,String>()
+
+            status?.apply {
+                from["status"] = toString()
+            }
+
+
+            type?.apply {
+                from["type"] = toString()
+            }
+
+            priority?.apply {
+                from["priority"] = toString()
+            }
+
+            from["orderby"] = orderBy.toString()
+
+            httpClient.doPost(url,from,object:HttpClient.OnIRequestResult{
+                override fun onError(e: Exception, response: String) {
+
+                }
+
+                override fun onSuccess(json: String) {
+                    val reply = WanResponseAnalyst(json)
+                    if (reply.isSuccess()){
+                        val t = reply.getData()
+                        log(t,"HttpClient")
+                        callback(JSON.parseObject(json,QueryTodoBean::class.java))
+//                        callback(reply.parseObject(QueryTodoBean::class.java))
+                    }else if (reply.isLoginInvalid()){
+                        LoginStateManager.loginInvalid()
+                    }else{
+
+                    }
+
+                }
+            })
+
+        }
+
+        fun delete(id:Int){
+            val url = "$baseUrl/lg/todo/delete/$id/json"
+            httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
+                override fun onError(e: Exception, response: String) {
+
+                }
+
+                override fun onSuccess(json: String) {
+
+                }
+
+            })
+        }
+
+        fun update(id:Int,title:String,context:String,date:String,status: Int = STATUS_TO_UNFINISH,type:Int = 1,priority:Int = 1){
+            val url = "$baseUrl/lg/todo/update/$id/json"
+
+            val from = ArrayMap<String,String>()
+            from["id"] = id.toString()
+            from["title"] = title
+            from["content"] = context
+            from["date"] = date
+            from["status"] = status.toString()
+            from["type"] = type.toString()
+            from["priority"] = priority.toString()
+
+
+            httpClient.doPost(url,from,object:HttpClient.OnIRequestResult{
+                override fun onError(e: Exception, response: String) {
+
+                }
+
+                override fun onSuccess(json: String) {
+
+                }
+
+            })
+        }
     }
 
-    fun queryTODO(){
 
-    }
-
-    fun deleteTODO(){
-
-    }
 
     private fun cleanErrorTemp(key: String) {
         Preference.clearPreference(key)
