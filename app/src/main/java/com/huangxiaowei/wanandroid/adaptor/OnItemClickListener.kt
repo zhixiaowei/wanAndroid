@@ -1,5 +1,7 @@
 package com.huangxiaowei.wanandroid.adaptor;
 
+import android.view.View
+
 interface OnItemClickListener {
-    fun onItemClick(obj: Any?, position: Int): Boolean
+    fun onItemClick(v: View, position: Int): Boolean
 }

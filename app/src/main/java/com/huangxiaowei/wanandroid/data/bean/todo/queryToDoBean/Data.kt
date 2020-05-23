@@ -1,7 +1,7 @@
 package com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean
 
 data class Data(
-    val completeDate: Any,
+    val completeDate: Any?= null,
     val completeDateStr: String,
     val content: String,
     val date: Long,

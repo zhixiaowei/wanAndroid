@@ -1,6 +1,7 @@
 package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.JSONObject
 import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.WanResponseAnalyst
 import com.huangxiaowei.wanandroid.data.bean.UserBean
@@ -360,39 +361,47 @@ object RequestCtrl {
 
             val url = "$baseUrl/lg/todo/v2/list/$page/json"
 
-            val from = ArrayMap<String,String>()
+//            val from = ArrayMap<String,String>()
+//
+//            status?.apply {
+//                from["status"] = toString()
+//            }
+//
+//
+//            type?.apply {
+//                from["type"] = toString()
+//            }
+//
+//            priority?.apply {
+//                from["priority"] = toString()
+//            }
+//
+//            from["orderby"] = orderBy.toString()
 
-            status?.apply {
-                from["status"] = toString()
-            }
-
-
-            type?.apply {
-                from["type"] = toString()
-            }
-
-            priority?.apply {
-                from["priority"] = toString()
-            }
-
-            from["orderby"] = orderBy.toString()
-
-            httpClient.doPost(url,from,object:HttpClient.OnIRequestResult{
+            httpClient.doGet(url,object:HttpClient.OnIRequestResult{
                 override fun onError(e: Exception, response: String) {
 
                 }
 
                 override fun onSuccess(json: String) {
-                    val reply = WanResponseAnalyst(json)
-                    if (reply.isSuccess()){
-                        val t = reply.getData()
-                        log(t,"HttpClient")
-                        callback(JSON.parseObject(json,QueryTodoBean::class.java))
-//                        callback(reply.parseObject(QueryTodoBean::class.java))
-                    }else if (reply.isLoginInvalid()){
-                        LoginStateManager.loginInvalid()
-                    }else{
 
+                    uiScope.launch {
+                        val reply = WanResponseAnalyst(json)
+                        if (reply.isSuccess()){
+                            val t = reply.getData()
+                            log(t,"HttpClient")
+
+                            val j = org.json.JSONObject(t)
+                            if (j.has("datas")){
+                                log(j.getString("datas"),"array")
+                            }
+
+                            callback(reply.parseObject(QueryTodoBean::class.java))
+                        }else if (reply.isLoginInvalid()){
+                            LoginStateManager.loginInvalid()
+                        }else{
+
+                        }
                     }
 
                 }
