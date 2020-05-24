@@ -4,9 +4,11 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.huangxiaowei.wanandroid.R
+import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.DataX
 
@@ -24,6 +26,7 @@ class ArticleListAdapter(private val context: Context,listBean: ArticleListBean)
             holder.author = tempView.findViewById(R.id.articleAuthor) as TextView
             holder.title = tempView.findViewById(R.id.articleTitle) as TextView
             holder.time = tempView.findViewById(R.id.articleTime) as TextView
+            holder.like = tempView.findViewById(R.id.like)
             tempView.tag = holder
         }else{
             tempView = convertView
@@ -39,6 +42,34 @@ class ArticleListAdapter(private val context: Context,listBean: ArticleListBean)
 
         holder.time.text = data.niceDate
         holder.title.text = data.title
+
+        holder.like.run {
+            setImageResource(
+                if (data.collect){
+                    R.drawable.like_
+                }else{
+                    R.drawable.unlike_
+                })
+
+            setOnClickListener {
+                if (data.collect){
+                    RequestCtrl.requestUNCollect(data.id){
+                        if (it){
+                            list[position].collect = false
+                            setImageResource(R.drawable.unlike_)
+                        }
+                    }
+                }else{
+                    RequestCtrl.requestCollect(data.id){
+                        if (it){
+                            list[position].collect = true
+                            setImageResource(R.drawable.like_)
+                        }
+                    }
+                }
+
+            }
+        }
 
         return tempView
     }
@@ -59,6 +90,7 @@ class ArticleListAdapter(private val context: Context,listBean: ArticleListBean)
         lateinit var author:TextView
         lateinit var title:TextView
         lateinit var time:TextView
+        lateinit var like:ImageView
     }
 
     override fun getItem(position: Int): DataX =  list[position]

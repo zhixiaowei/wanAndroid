@@ -26,7 +26,6 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
             }
         }
 
-
         return true
     }
 
@@ -52,8 +51,13 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
                     adapter = TodoListAdapter(attackActivity,bean)
                     adapter!!.setOnItemClickListener(this@TODOFragment)
                     todoList.adapter = adapter
+                }else if (bean.curPage == 1) {
+                    adapter?.apply {
+                        clear()
+                        addList(bean)
+                    }
                 }else{
-                    adapter!!.addList(bean)
+                    adapter?.addList(bean)
                 }
 
             }

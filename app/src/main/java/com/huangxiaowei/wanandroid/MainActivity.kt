@@ -1,8 +1,10 @@
 package com.huangxiaowei.wanandroid
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.ArrayMap
 import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
@@ -10,9 +12,13 @@ import com.huangxiaowei.wanandroid.globalStatus.KeyEventManager
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.ui.*
+import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
+
+    private lateinit var bottomBtn:Array<Button>//底部的按钮
+
     override fun onLoginInvalid() {
         fragmentCtrl.showFragment(TAG_LOGIN)
     }
@@ -38,6 +44,9 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        bottomBtn = arrayOf(main_home,main_user,main_weChat,main_square)
+        updateBottomBtnStatus(main_home)
+
         val map = ArrayMap<String,Fragment>()
         map[TAG_HOME] = HomeFragment()
         map[TAG_WE_CHAT] = WeChatFragment()
@@ -51,6 +60,8 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
     }
 
     override fun onClick(view: View) {
+        updateBottomBtnStatus(view)
+
         when(view.id){
             R.id.main_home ->
                 fragmentCtrl.showFragment(TAG_HOME)
@@ -62,6 +73,21 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
                 }else{
                     fragmentCtrl.showFragment(TAG_LOGIN)
                 }
+        }
+    }
+
+    /**
+     * 将传入的按钮设为选中状态，并将其他置为非选中状态
+     */
+    private fun updateBottomBtnStatus(view: View) {
+        if (view is Button){
+            for (v in bottomBtn){
+                if (v === view){
+                    v.setTextColor(Color.BLACK)
+                }else{
+                    v.setTextColor(Color.GRAY)
+                }
+            }
         }
     }
 

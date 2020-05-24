@@ -208,6 +208,39 @@ object RequestCtrl {
         }
     }
 
+    fun requestCollect(id:Int,callback: (result:Boolean) -> Unit){
+        val url = "$baseUrl/lg/collect/$id/json"
+
+        httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
+            override fun onError(e: Exception, response: String) {
+
+            }
+
+            override fun onSuccess(json: String) {
+                val reply = WanResponseAnalyst(json)
+                if (reply.isSuccess()){
+                    callback(true)
+                }
+            }
+        })
+    }
+
+    fun requestUNCollect(id:Int,callback: (result:Boolean) -> Unit){
+        val url = "https://www.wanandroid.com/lg/uncollect_originId/$id/json"
+
+        httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
+            override fun onError(e: Exception, response: String) {
+
+            }
+
+            override fun onSuccess(json: String) {
+                val reply = WanResponseAnalyst(json)
+
+                callback(reply.isSuccess())
+            }
+        })
+    }
+
     /**
      * 请求收藏的文章
      */
@@ -355,6 +388,13 @@ object RequestCtrl {
 
         }
 
+        /**
+         * [page]页码；
+         * [orderBy]排序 如：根据创建时间顺序[ORDER_CREATE_DATE_INVERTED]；
+         * [status]完成状态，未完成[STATUS_TO_UNFINISH],完成[STATUS_TO_FINISH]；
+         * [type]类型,默认为0.即全部；
+         * [priority]优先级；
+         */
         fun query(page:Int,orderBy:Int = ORDER_CREATE_DATE_POSITIVE
                   ,status:Int? = null,type:Int? = null,priority:Int? = null
                   ,callback: (bean: QueryTodoBean?) -> Unit){

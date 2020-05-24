@@ -1,6 +1,5 @@
 package com.huangxiaowei.wanandroid.ui
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
@@ -13,9 +12,7 @@ import com.huangxiaowei.wanandroid.adaptor.ImageAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerItem
-import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.ui.view.SuperListView
-import com.huangxiaowei.wanandroid.utils.permission.PermissionCtrl
 import com.youth.banner.Banner
 import com.youth.banner.indicator.CircleIndicator
 import com.youth.banner.util.BannerUtils.dp2px
@@ -28,7 +25,6 @@ class  HomeFragment:BaseFragment(){
     }
 
     private var articleAdapter: ArticleListAdapter?= null
-    private val permission = Manifest.permission.INTERNET//网络权限
     private lateinit var bannerView: Banner<*, *>
 
     private var page = 0//文章列表分页
@@ -36,29 +32,18 @@ class  HomeFragment:BaseFragment(){
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
         initView()
 
-        //如果本地有，则先获取本地的
-        //如果没有，请求网络
-        val permissionCtrl = PermissionCtrl()
-
-        permissionCtrl.requestPermission(attackActivity,permission) { isGrant ->
-            if (isGrant) {
-
-                updateArticleList()
-
-                updateBanner()
-
-            } else {
-                showToast("拒绝权限后，部分功能可能无法正常运行！")
-            }
-        }
+        showArticleList()
+        showBanner()
     }
 
-
+    private fun showArticleList(){
+        updateArticleList()
+    }
 
     /**
      * 更新Banner
      */
-    private fun updateBanner() {
+    private fun showBanner() {
         RequestCtrl.requestBanner {
 
             val adapter = ImageAdapter(

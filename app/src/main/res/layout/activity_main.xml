@@ -15,8 +15,10 @@
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/main_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:orientation="horizontal"
         >
 
@@ -26,7 +28,17 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="onClick"
+            android:background="@null"
             android:text="首页"/>
+
+        <Button
+            android:id="@+id/main_square"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onClick"
+            android:background="@null"
+            android:text="广场"/>
 
         <Button
             android:id="@+id/main_weChat"
@@ -34,13 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="onClick"
-            android:text="广场"/>
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="onClick"
+            android:background="@null"
             android:text="公众号"/>
 
         <Button
@@ -49,6 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="onClick"
+            android:background="@null"
             android:text="个人信息"/>
 
     </LinearLayout>
