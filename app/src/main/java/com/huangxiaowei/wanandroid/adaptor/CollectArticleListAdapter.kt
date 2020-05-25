@@ -34,8 +34,6 @@ class CollectArticleListAdapter(private val context: Context, listBean: CollectA
 
         val data = list[position]
         holder.author.text = data.author
-
-
         holder.time.text = data.niceDate
         holder.title.text = data.title
 

@@ -37,6 +37,16 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
         loadList()
+
+        //已完成的TODO
+        finishView.setOnClickListener {
+
+        }
+
+        //未完成的TODO
+        todoView.setOnClickListener {
+
+        }
     }
 
     private fun loadList(){

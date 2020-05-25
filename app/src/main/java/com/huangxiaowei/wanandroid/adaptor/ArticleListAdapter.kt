@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
@@ -54,6 +53,7 @@ class ArticleListAdapter(private val context: Context,listBean: ArticleListBean)
             setOnClickListener {
                 if (data.collect){
                     RequestCtrl.requestUNCollect(data.id){
+
                         if (it){
                             list[position].collect = false
                             setImageResource(R.drawable.unlike_)
@@ -67,7 +67,6 @@ class ArticleListAdapter(private val context: Context,listBean: ArticleListBean)
                         }
                     }
                 }
-
             }
         }
 
