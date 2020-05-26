@@ -20,8 +20,8 @@ class UserFragment:BaseFragment(),View.OnClickListener{
 
     private val KEY_USER = "KEY_USER"//用户
     private val KEY_COLLECT = "KEY_COLLECT"//收藏文章
-    private val KEY_TODO = "KEY_TODO"
-    private val KEY_COIN_DETAILS = "KEY_COIN_DETAILS"
+    private val KEY_TODO = "KEY_TODO"//todoView
+    private val KEY_COIN_DETAILS = "KEY_COIN_DETAILS"//硬币详情
 
     override fun getLayout(): Int {
         return R.layout.fragment_user
@@ -50,6 +50,11 @@ class UserFragment:BaseFragment(),View.OnClickListener{
                 }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        fragmentCtrl.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroyView() {

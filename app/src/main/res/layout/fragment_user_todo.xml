@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <com.huangxiaowei.wanandroid.ui.view.SuperListView
@@ -11,6 +12,17 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         tools:listitem="@layout/todo_item"
+        />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addTodoBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType = "fitXY"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
+        app:borderWidth ="0dp"
+        android:src="@drawable/add"
         />
 
     <LinearLayout
@@ -34,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@null"
-            android:src="@drawable/todo_finish"
+            android:src="@drawable/todo_finish_grep"
             />
 
     </LinearLayout>

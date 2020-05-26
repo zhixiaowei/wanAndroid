@@ -39,10 +39,10 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
 
         val data = list[position]
 
-        val status = if (data.status == RequestCtrl.TODO.STATUS_TO_FINISH){"(完成)"}else{"(未完成)"}
-
-        holder.title.text = data.title+status
+        holder.title.text = data.title
         holder.context.text = data.content
+
+        holder.finishBtn.text = if (data.status == RequestCtrl.TODO.STATUS_TO_FINISH){"已完成"}else{"取消完成"}
 
         holder.finishBtn.setOnClickListener {
             onItemClickListener?.onItemClick(it,position)
@@ -59,13 +59,15 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
     /**
      * 添加列表
      */
-    fun addList(listBean: QueryTodoBean){
-        listBean.datas?.apply {
+    fun addList(mlist: List<Data>?){
+        mlist?.apply {
             list.addAll(this)
         }
 
         notifyDataSetChanged()
     }
+
+    fun getList():ArrayList<Data> = list
 
     fun clear(){
         list.clear()

@@ -396,10 +396,12 @@ object RequestCtrl {
          * [priority]优先级；
          */
         fun query(page:Int,orderBy:Int = ORDER_CREATE_DATE_POSITIVE
-                  ,status:Int? = null,type:Int? = null,priority:Int? = null
+                  ,status:Int = -1,type:Int? = null,priority:Int? = null
                   ,callback: (bean: QueryTodoBean?) -> Unit){
 
-            val url = "$baseUrl/lg/todo/v2/list/$page/json"
+            val url = "$baseUrl/lg/todo/v2/list/$page/json?status=$status&orderby=$orderBy" +
+                    if (type!=null){"type=$type"}else{""}+
+                    if (type!=null){"priority=$priority"}else{""}
 
 //            val from = ArrayMap<String,String>()
 //
