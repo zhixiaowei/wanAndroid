@@ -6,25 +6,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-    <com.huangxiaowei.wanandroid.ui.view.SuperListView
-        android:id="@+id/todoList"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        tools:listitem="@layout/todo_item"
-        />
+        >
+        <com.huangxiaowei.wanandroid.ui.view.SuperListView
+            android:id="@+id/todoList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_todo"
+            />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addTodoBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scaleType = "fitXY"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="16dp"
-        app:borderWidth ="0dp"
-        android:src="@drawable/add"
-        />
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/addTodoBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="15dp"
+            android:src="@drawable/add"
+            app:borderWidth="12dp" />
 
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

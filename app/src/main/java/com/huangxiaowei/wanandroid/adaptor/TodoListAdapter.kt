@@ -25,7 +25,7 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
         val holder:ViewHolder
 
         if (convertView==null){
-            tempView = View.inflate(context, R.layout.todo_item, null)
+            tempView = View.inflate(context, R.layout.item_todo, null)
             holder = ViewHolder()
             holder.title = tempView.findViewById(R.id.todo_title)
             holder.context = tempView.findViewById(R.id.todo_context)
@@ -42,7 +42,7 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
         holder.title.text = data.title
         holder.context.text = data.content
 
-        holder.finishBtn.text = if (data.status == RequestCtrl.TODO.STATUS_TO_FINISH){"已完成"}else{"取消完成"}
+        holder.finishBtn.text = if (data.status == RequestCtrl.TODO.STATUS_TO_UNFINISH){"已完成"}else{"取消完成"}
 
         holder.finishBtn.setOnClickListener {
             onItemClickListener?.onItemClick(it,position)
@@ -50,7 +50,6 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
 
         holder.deleteBtn.setOnClickListener {
             onItemClickListener?.onItemClick(it,position)
-            RequestCtrl.TODO.delete(data.id)
         }
 
         return tempView

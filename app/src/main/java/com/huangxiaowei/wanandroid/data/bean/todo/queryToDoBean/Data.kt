@@ -8,7 +8,7 @@ data class Data(
     val dateStr: String,
     val id: Int,
     val priority: Int,
-    val status: Int,
+    var status: Int,
     val title: String,
     val type: Int,
     val userId: Int

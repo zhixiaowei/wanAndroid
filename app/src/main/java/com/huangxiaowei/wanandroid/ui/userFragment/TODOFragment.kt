@@ -17,6 +17,13 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
     private var doList:ArrayList<ToDoData>? = null
     private var finishList:ArrayList<ToDoData>? = null
 
+    private val CURRENT_DO_LIST = 0
+    private val CURRENT_FINISH_LIST = 1
+
+    private var current:Int = CURRENT_DO_LIST
+
+
+
     override fun onItemClick(v: View, position: Int): Boolean {
 
         adapter?.run {
@@ -24,7 +31,33 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
 
             when(v.id){
                 R.id.todoFinishBtn->{
-                    TODO.update(data.id,data.title,data.content,data.dateStr, TODO.STATUS_TO_FINISH)
+                    val status  = if (data.status == TODO.STATUS_TO_UNFINISH){
+                        TODO.STATUS_TO_FINISH
+                    }else{
+                        TODO.STATUS_TO_UNFINISH
+                    }
+                    TODO.update(data.id,data.title,data.content,data.dateStr,status){
+                        if (it){
+                            if (data.status == TODO.STATUS_TO_UNFINISH){
+                                data.status = TODO.STATUS_TO_FINISH
+                                doList?.remove(data)
+                                finishList?.add(data)
+                            }else{
+                                data.status = TODO.STATUS_TO_UNFINISH
+                                finishList?.remove(data)
+                                doList?.add(data)
+                            }
+
+                            adapter?.apply {
+                                clear()
+                                if (current == CURRENT_DO_LIST){
+                                    doList?.apply { addList(this) }
+                                }else{
+                                    finishList?.apply { addList(finishList) }
+                                }
+                            }
+                        }
+                    }
                 }
                 R.id.todoDeleteBtn->{
                     TODO.delete(data.id)
@@ -54,6 +87,7 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
             todoView.setImageResource(R.drawable.todo_doing_grep)
             finishView.setImageResource(R.drawable.todo_finish)
 
+            current = CURRENT_FINISH_LIST
             if (finishList == null){
                 loadList(TODO.STATUS_TO_FINISH)
             }else{
@@ -70,6 +104,7 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
 
             todoView.setImageResource(R.drawable.todo_doing)
             finishView.setImageResource(R.drawable.todo_finish_grep)
+            current = CURRENT_DO_LIST
 
             if (doList == null){
                 loadList(TODO.STATUS_TO_UNFINISH)

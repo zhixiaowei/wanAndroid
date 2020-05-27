@@ -366,7 +366,7 @@ object RequestCtrl {
         const val STATUS_TO_UNFINISH = 0//从完成到未完成
         const val STATUS_TO_FINISH = 1//从未完成到完成
 
-        fun add(title:String,context:String,date:String,type:Int = 1,priority:Int = 1){
+        fun add(title:String,context:String,date:String,type:Int = 1,priority:Int = 1,callback: (result: Boolean) -> Unit){
             val url = "$baseUrl/lg/todo/add/json"
 
             val from = ArrayMap<String,String>()
@@ -382,6 +382,11 @@ object RequestCtrl {
                 }
 
                 override fun onSuccess(json: String) {
+
+                    uiScope.run {
+                        val reply = WanResponseAnalyst(json)
+                        callback(reply.isSuccess())
+                    }
 
                 }
             })
@@ -401,24 +406,7 @@ object RequestCtrl {
 
             val url = "$baseUrl/lg/todo/v2/list/$page/json?status=$status&orderby=$orderBy" +
                     if (type!=null){"type=$type"}else{""}+
-                    if (type!=null){"priority=$priority"}else{""}
-
-//            val from = ArrayMap<String,String>()
-//
-//            status?.apply {
-//                from["status"] = toString()
-//            }
-//
-//
-//            type?.apply {
-//                from["type"] = toString()
-//            }
-//
-//            priority?.apply {
-//                from["priority"] = toString()
-//            }
-//
-//            from["orderby"] = orderBy.toString()
+                    if (priority!=null){"priority=$priority"}else{""}
 
             httpClient.doGet(url,object:HttpClient.OnIRequestResult{
                 override fun onError(e: Exception, response: String) {
@@ -465,7 +453,8 @@ object RequestCtrl {
             })
         }
 
-        fun update(id:Int,title:String,context:String,date:String,status: Int = STATUS_TO_UNFINISH,type:Int = 1,priority:Int = 1){
+        fun update(id:Int,title:String,context:String,date:String,status: Int = STATUS_TO_UNFINISH,type:Int = 1,priority:Int = 1,
+                   callback: (result: Boolean) -> Unit){
             val url = "$baseUrl/lg/todo/update/$id/json"
 
             val from = ArrayMap<String,String>()
@@ -484,6 +473,15 @@ object RequestCtrl {
                 }
 
                 override fun onSuccess(json: String) {
+                    val reply = WanResponseAnalyst(json)
+
+                    uiScope.launch {
+                        if (reply.isSuccess()){
+                            callback(true)
+                        }else{
+                            callback(false)
+                        }
+                    }
 
                 }
 
