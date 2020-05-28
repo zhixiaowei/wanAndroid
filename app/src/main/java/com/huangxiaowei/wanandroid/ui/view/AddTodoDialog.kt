@@ -3,19 +3,23 @@ package com.huangxiaowei.wanandroid.ui.view
 import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.DialogFragment
 import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import com.huangxiaowei.wanandroid.R
-import com.huangxiaowei.wanandroid.client.RequestCtrl
-import com.huangxiaowei.wanandroid.showToast
+import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
 import kotlinx.android.synthetic.main.dialog_add_todo.*
 import java.util.*
 
 
-class AddTodoDialog:DialogFragment(){
+class AddTodoDialog(private val callback:IDialogClickCallback?):DialogFragment(){
+
+    private val handler = Handler(Looper.getMainLooper())
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,20 +63,22 @@ class AddTodoDialog:DialogFragment(){
         }
 
         todo_add.setOnClickListener {
-            val title = todo_title.text.toString()
-            val context = todo_context.text.toString()
-            val date = todo_date.text.toString()
 
-            RequestCtrl.TODO.add(title,context,date){
-                if (it){
-                    showToast("添加成功！")
-                    dismiss()
-                }else{
-                    showToast("添加失败！")
-                }
-            }
+            val todo = TodoBean()
+            todo.title = todo_title.text.toString()
+            todo.content = todo_context.text.toString()
+            todo.completeDateStr = todo_date.text.toString()
+
+            callback?.onComfig(this,todo)
+
+
         }
 
+    }
+
+    interface IDialogClickCallback{
+        fun onComfig(dialog: AddTodoDialog,todo:TodoBean)
+        fun onCancle()
     }
 
 }

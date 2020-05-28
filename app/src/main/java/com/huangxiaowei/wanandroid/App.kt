@@ -6,6 +6,8 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.alibaba.fastjson.JSON
@@ -20,7 +22,10 @@ class App:Application(){
     companion object{
         @SuppressLint("StaticFieldLeak")
         lateinit var context:Context
+
+        val handler = Handler(Looper.getMainLooper())
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -57,7 +62,9 @@ class App:Application(){
 }
 
 fun showToast(text: String){
-    Toast.makeText(App.context,text,Toast.LENGTH_SHORT).show()
+    App.handler.post {
+        Toast.makeText(App.context,text,Toast.LENGTH_SHORT).show()
+    }
 }
 
 fun log(str:String,tag:String = "TAG"){

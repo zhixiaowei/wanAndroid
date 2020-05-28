@@ -7,22 +7,19 @@ import com.huangxiaowei.wanandroid.adaptor.OnItemClickListener
 import com.huangxiaowei.wanandroid.adaptor.TodoListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl.TODO
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.Data as ToDoData
+import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
 import com.huangxiaowei.wanandroid.ui.BaseFragment
 import com.huangxiaowei.wanandroid.ui.view.AddTodoDialog
 import kotlinx.android.synthetic.main.fragment_user_todo.*
 
 class TODOFragment :BaseFragment(),OnItemClickListener {
 
-    private var doList:ArrayList<ToDoData>? = null
-    private var finishList:ArrayList<ToDoData>? = null
+    private var doList:ArrayList<TodoBean>? = null
+    private var finishList:ArrayList<TodoBean>? = null
 
     private val CURRENT_DO_LIST = 0
     private val CURRENT_FINISH_LIST = 1
-
     private var current:Int = CURRENT_DO_LIST
-
-
 
     override fun onItemClick(v: View, position: Int): Boolean {
 
@@ -40,6 +37,7 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
                         if (it){
                             if (data.status == TODO.STATUS_TO_UNFINISH){
                                 data.status = TODO.STATUS_TO_FINISH
+
                                 doList?.remove(data)
                                 finishList?.add(data)
                             }else{
@@ -60,7 +58,17 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
                     }
                 }
                 R.id.todoDeleteBtn->{
-                    TODO.delete(data.id)
+                    TODO.delete(data.id){
+                        if (it){
+                            if (current == CURRENT_DO_LIST){
+                                doList?.apply { remove(data) }
+                            }else{
+                                finishList?.apply { remove(data) }
+                            }
+
+                            adapter!!.remove(data)
+                        }
+                    }
                 }
             }
         }
@@ -80,7 +88,6 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
 
         todoView.setImageResource(R.drawable.todo_doing)
         finishView.setImageResource(R.drawable.todo_finish_grep)
-
 
         //已完成的TODO
         finishView.setOnClickListener {
@@ -119,8 +126,28 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
         addTodoBtn.setOnClickListener {
             showToast("打开一个页面用来添加TODO")
 
-            val d = AddTodoDialog()
+            val d = AddTodoDialog(object:AddTodoDialog.IDialogClickCallback{
+                override fun onComfig(dialog: AddTodoDialog,todo:TodoBean) {
+                    TODO.add(todo.title,todo.content,todo.completeDateStr){
+
+                        if (it){
+                            showToast("添加成功！")
+                            adapter?.addList(listOf(todo))
+                            dialog.dismiss()
+                        }else{
+                            showToast("添加失败！")
+                        }
+                    }
+
+                    dialog.dismiss()
+                }
+
+                override fun onCancle() {
+
+                }
+            })
             d.show(childFragmentManager,"HHHHHH")
+
         }
     }
 
@@ -134,7 +161,7 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
 
             bean.datas?.apply {
                 if (adapter == null){
-                    adapter = TodoListAdapter(attackActivity,bean)
+                    adapter = TodoListAdapter(attackActivity,ArrayList(this))
                     adapter!!.setOnItemClickListener(this@TODOFragment)
                     todoList.adapter = adapter
                 }else if (bean.curPage == 0||bean.curPage == 1) {

@@ -2,7 +2,7 @@ package com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean
 
 data class QueryTodoBean(
     val curPage: Int,
-    val datas: List<Data>? = mutableListOf(),
+    val datas: List<TodoBean>? = mutableListOf(),
     val offset: Int,
     val over: Boolean,
     val pageCount: Int,

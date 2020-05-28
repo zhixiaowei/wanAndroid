@@ -8,12 +8,10 @@ import android.widget.Button
 import android.widget.TextView
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
-import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.Data
-import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
+import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
+import com.huangxiaowei.wanandroid.ui.view.SlideLayout
 
-class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):BaseAdapter(){
-
-    private val list = ArrayList(listBean.datas!!)
+class TodoListAdapter(private val context: Context,private val list:ArrayList<TodoBean>):BaseAdapter() {
 
     private var onItemClickListener:OnItemClickListener? = null
     fun setOnItemClickListener(listener:OnItemClickListener){
@@ -31,6 +29,7 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
             holder.context = tempView.findViewById(R.id.todo_context)
             holder.deleteBtn = tempView.findViewById(R.id.todoDeleteBtn)
             holder.finishBtn = tempView.findViewById(R.id.todoFinishBtn)
+            holder.slideLayout = tempView.findViewById(R.id.slideLayout)
             tempView.tag = holder
         }else{
             tempView = convertView
@@ -42,6 +41,7 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
         holder.title.text = data.title
         holder.context.text = data.content
 
+        holder.slideLayout.smoothCloseSlide()
         holder.finishBtn.text = if (data.status == RequestCtrl.TODO.STATUS_TO_UNFINISH){"已完成"}else{"取消完成"}
 
         holder.finishBtn.setOnClickListener {
@@ -58,7 +58,7 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
     /**
      * 添加列表
      */
-    fun addList(mlist: List<Data>?){
+    fun addList(mlist: List<TodoBean>?){
         mlist?.apply {
             list.addAll(this)
         }
@@ -66,7 +66,13 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
         notifyDataSetChanged()
     }
 
-    fun getList():ArrayList<Data> = list
+    fun remove(data:TodoBean){
+        list.remove(data)
+
+        notifyDataSetChanged()
+    }
+
+    fun getList():ArrayList<TodoBean> = list
 
     fun clear(){
         list.clear()
@@ -77,9 +83,10 @@ class TodoListAdapter(private val context: Context, listBean:QueryTodoBean):Base
         lateinit var context:TextView
         lateinit var deleteBtn:Button
         lateinit var finishBtn:Button
+        lateinit var slideLayout: SlideLayout
     }
 
-    override fun getItem(position: Int): Data =  list[position]
+    override fun getItem(position: Int): TodoBean =  list[position]
     override fun getItemId(position: Int): Long =  position.toLong()
     override fun getCount(): Int = list.size
 

@@ -383,7 +383,7 @@ object RequestCtrl {
 
                 override fun onSuccess(json: String) {
 
-                    uiScope.run {
+                    uiScope.launch {
                         val reply = WanResponseAnalyst(json)
                         callback(reply.isSuccess())
                     }
@@ -439,7 +439,7 @@ object RequestCtrl {
 
         }
 
-        fun delete(id:Int){
+        fun delete(id:Int,callback: (result: Boolean) -> Unit){
             val url = "$baseUrl/lg/todo/delete/$id/json"
             httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
                 override fun onError(e: Exception, response: String) {
@@ -447,6 +447,10 @@ object RequestCtrl {
                 }
 
                 override fun onSuccess(json: String) {
+                    uiScope.launch {
+                        val reply = WanResponseAnalyst(json)
+                        callback(reply.isSuccess())
+                    }
 
                 }
 
