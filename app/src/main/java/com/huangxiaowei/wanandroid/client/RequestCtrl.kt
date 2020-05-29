@@ -329,6 +329,28 @@ object RequestCtrl {
         })
     }
 
+    fun requestRearch(msg:String,page:Int = 0,callback: (page: Int, reply: ArticleListBean) -> Unit){
+        val url = "$baseUrl/article/query/$page/json"
+
+        val form = ArrayMap<String,String>()
+        form["k"] = msg
+        httpClient.doPost(url,form,object :HttpClient.OnIRequestResult{
+            override fun onError(e: Exception, response: String) {
+
+            }
+
+            override fun onSuccess(json: String) {
+                val reply = WanResponseAnalyst(json)
+                if (reply.isSuccess()){
+
+                }else{
+
+                }
+            }
+        })
+
+    }
+
     /**
      * 获取积分详情
      */

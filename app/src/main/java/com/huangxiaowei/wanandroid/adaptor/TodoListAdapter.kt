@@ -41,7 +41,7 @@ class TodoListAdapter(private val context: Context,private val list:ArrayList<To
         holder.title.text = data.title
         holder.context.text = data.content
 
-        holder.slideLayout.smoothCloseSlide()
+        holder.slideLayout.smoothCloseSlide()//控件复位
         holder.finishBtn.text = if (data.status == RequestCtrl.TODO.STATUS_TO_UNFINISH){"已完成"}else{"取消完成"}
 
         holder.finishBtn.setOnClickListener {
