@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
         const val TAG_WE_CHAT = "TAG_WE_CHAT"
         const val TAG_USER = "TAG_USER"
         const val TAG_LOGIN = "TAG_LOGIN"
+        const val TAG_SEARCH = "TAG_SEARCH"
     }
 
     private val fragmentCtrl = FragmentCtrl()//fragment的显示及隐藏，重建的管理类
@@ -47,11 +48,12 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
         bottomBtn = arrayOf(main_home,main_user,main_weChat,main_square)
         updateBottomBtnStatus(main_home)
 
-        val map = ArrayMap<String,Fragment>()
+        val map = ArrayMap<String,BaseFragment>()
         map[TAG_HOME] = HomeFragment()
         map[TAG_WE_CHAT] = WeChatFragment()
         map[TAG_USER] = UserFragment()
         map[TAG_LOGIN] = LoginFragment()
+        map[TAG_SEARCH] = SearchFragment()
 
         fragmentCtrl.onCreate(this ,savedInstanceState
             ,map, TAG_HOME)
@@ -65,6 +67,8 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
         when(view.id){
             R.id.main_home ->
                 fragmentCtrl.showFragment(TAG_HOME)
+            R.id.main_square ->
+                fragmentCtrl.showFragment(TAG_SEARCH)
             R.id.main_weChat->
                 fragmentCtrl.showFragment(TAG_WE_CHAT)
             R.id.main_user->

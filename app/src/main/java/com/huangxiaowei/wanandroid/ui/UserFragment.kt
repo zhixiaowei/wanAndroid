@@ -28,7 +28,7 @@ class UserFragment:BaseFragment(),View.OnClickListener{
     }
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
-        val list = ArrayMap<String,Fragment>()
+        val list = ArrayMap<String,BaseFragment>()
         list[KEY_USER] = UserMainFragment(this)
         list[KEY_COLLECT] = CollectArticlesFragment()
         list[KEY_TODO] = TODOFragment()

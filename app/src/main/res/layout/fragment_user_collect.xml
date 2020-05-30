@@ -4,10 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.huangxiaowei.wanandroid.ui.view.SuperListView
-        android:id="@+id/articleList"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+    <include layout="@layout/include_article_list"/>
 
 </LinearLayout>

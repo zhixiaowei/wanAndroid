@@ -16,7 +16,22 @@ class FragmentCtrl{
 
     private var currentFragment:Fragment? = null//当前正在显示Fragment
     private lateinit var fragmentManager: FragmentManager
-    private lateinit var list:ArrayMap<String,Fragment>
+    private lateinit var list:ArrayMap<String,BaseFragment>
+
+    private val stackList = ArrayList<String>()//Fragment栈管理
+
+    private val executor = object:BaseFragment.OnFragmentRequestCallback{
+        override fun onStartFragment(tag: String) {
+            showFragment(tag)
+        }
+
+        override fun finish() {
+            stackList.removeAt(0)
+            if (stackList.isNotEmpty()){
+                showFragment(stackList[0])
+            }
+        }
+    }
 
     /**
      * 在Activity的onCreate方法中调用该方法
@@ -25,7 +40,7 @@ class FragmentCtrl{
      */
     fun onCreate(activity: AppCompatActivity
                  ,savedInstanceState: Bundle?
-                 ,list:ArrayMap<String,Fragment>//Fragment及对应的TAG
+                 ,list:ArrayMap<String,BaseFragment>//Fragment及对应的TAG
                  ,default:String?//默认显示的Fragment的TAG
                  ){
 
@@ -38,17 +53,21 @@ class FragmentCtrl{
      * [list]为当前Activity需要显示的所有Fragment的实例及对应的TAG
      * [default]为Activity默认显示的Fragment的TAG
      */
-    fun onCreate(fragment: Fragment
+    fun onCreate(fragment: BaseFragment
                  ,savedInstanceState: Bundle?
-                 ,list:ArrayMap<String,Fragment>//Fragment及对应的TAG
+                 ,list:ArrayMap<String,BaseFragment>//Fragment及对应的TAG
                  ,default:String?//默认显示的Fragment的TAG
                  ){
         fragmentManager = fragment.childFragmentManager
         onCreate(savedInstanceState,list,default)
     }
 
-    private fun onCreate(savedInstanceState: Bundle?, list: ArrayMap<String, Fragment>, default: String?) {
+    private fun onCreate(savedInstanceState: Bundle?, list: ArrayMap<String, BaseFragment>, default: String?) {
         this.list = list
+
+        for (fragment in list.values){
+            fragment?.setOnFragmentRequestCallback(executor)
+        }
 
         default?:return
 
@@ -57,12 +76,17 @@ class FragmentCtrl{
         }else{
             val tag = savedInstanceState.getString(KEY_TAG)?:default
             currentFragment = fragmentManager.findFragmentByTag(tag)
+
+            if (currentFragment!=null){
+                addStack(tag)
+            }
         }
     }
 
     fun showFragment(tag: String) {
 
         if (tag == currentFragment?.tag){
+            //不重复显示当前Fragment
             return
         }
 
@@ -70,16 +94,14 @@ class FragmentCtrl{
         //通过TAG从Fragment队列中获取
 
         if (temp == null||!temp.isAdded){
-
             try {
                 temp = list[tag]!!
             }catch (e:Exception){
                 throw Exception("TAG:$tag 找不到相应的Fragment,请确保调用onCreate(),并将相应TAG及Fragment实例加入队列")
             }
 
-
             if (currentFragment == null){
-
+                //onCreate()
                 fragmentManager.beginTransaction()
                     .add(R.id.fragmentContainer,temp, tag)
                     .commit()
@@ -98,6 +120,8 @@ class FragmentCtrl{
         }
 
         currentFragment = temp
+
+       addStack(tag)
     }
 
     fun getCurrentFragment():Fragment?{
@@ -110,5 +134,16 @@ class FragmentCtrl{
     fun onSaveInstanceState(outState: Bundle){
         outState.putString(KEY_TAG,currentFragment!!.tag)
         //保存当前的Fragment的TAG，并在恢复显示时从Bundle中取出，方便知道恢复时的Fragment
+    }
+
+    /**
+     * 将新的Fragment添加入栈，方便隐藏以及显示上一个等
+     */
+    private fun addStack(tag:String){
+        if (stackList.contains(tag)){
+            stackList.remove(tag)
+        }
+
+        stackList.add(0,tag)
     }
 }

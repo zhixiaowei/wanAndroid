@@ -9,6 +9,7 @@ import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectActicleListBean
 import com.huangxiaowei.wanandroid.ui.BaseFragment
 import kotlinx.android.synthetic.main.fragment_user_collect.*
+import kotlinx.android.synthetic.main.include_article_list.*
 
 class CollectArticlesFragment: BaseFragment() {
 

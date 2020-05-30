@@ -329,7 +329,7 @@ object RequestCtrl {
         })
     }
 
-    fun requestRearch(msg:String,page:Int = 0,callback: (page: Int, reply: ArticleListBean) -> Unit){
+    fun requestSearch(msg:String,page:Int = 0,callback: (page: Int, reply: ArticleListBean) -> Unit){
         val url = "$baseUrl/article/query/$page/json"
 
         val form = ArrayMap<String,String>()
@@ -341,11 +341,15 @@ object RequestCtrl {
 
             override fun onSuccess(json: String) {
                 val reply = WanResponseAnalyst(json)
-                if (reply.isSuccess()){
 
-                }else{
+                uiScope.launch {
+                    if (reply.isSuccess()){
+                        callback(0,reply.parseObject(ArticleListBean::class.java)!!)
+                    }else{
 
+                    }
                 }
+
             }
         })
 

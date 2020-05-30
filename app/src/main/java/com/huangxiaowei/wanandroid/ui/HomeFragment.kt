@@ -16,7 +16,7 @@ import com.huangxiaowei.wanandroid.ui.view.SuperListView
 import com.youth.banner.Banner
 import com.youth.banner.indicator.CircleIndicator
 import com.youth.banner.util.BannerUtils.dp2px
-import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.include_article_list.*
 
 class  HomeFragment:BaseFragment(){
 

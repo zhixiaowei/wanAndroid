@@ -6,37 +6,6 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-<FrameLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <!--返回顶部的悬浮按钮-->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scaleType = "fitXY"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="16dp"
-        android:visibility="invisible"
-        android:src="@drawable/back_top"
-        />
-
-    <com.huangxiaowei.wanandroid.ui.view.WSwipeRefreshLayout
-        android:id="@+id/articleRefresh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-        <com.huangxiaowei.wanandroid.ui.view.SuperListView
-            android:id="@+id/articleList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </com.huangxiaowei.wanandroid.ui.view.WSwipeRefreshLayout>
-
-</FrameLayout>
-
-
-
+    <include layout="@layout/include_article_list"/>
 
 </LinearLayout>
