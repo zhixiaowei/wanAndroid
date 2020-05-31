@@ -9,6 +9,7 @@ class SuperListView(context: Context,attrs: AttributeSet?=null):ListView(context
 
     private var isMoveToLast = false//是否移动到了列表末端
     private var topListPosition = 0//列表UI可见列表顶部的index
+    private var bottomPosition = 0//可见列表的底部
     private var iOnSlideListener:IOnSlideListener? = null
 
     fun setOnSlideListener(iOnSlideListener: IOnSlideListener){
@@ -52,9 +53,11 @@ class SuperListView(context: Context,attrs: AttributeSet?=null):ListView(context
             visibleItemCount: Int,
             totalItemCount: Int) {
 
-            isMoveToLast = (firstVisibleItem + visibleItemCount == totalItemCount)
 
-            if (firstVisibleItem != topListPosition) {
+                bottomPosition = firstVisibleItem+visibleItemCount
+                isMoveToLast = (bottomPosition == totalItemCount)
+
+                if (firstVisibleItem != topListPosition) {
 
                 if (firstVisibleItem > topListPosition) {
                     //下滑

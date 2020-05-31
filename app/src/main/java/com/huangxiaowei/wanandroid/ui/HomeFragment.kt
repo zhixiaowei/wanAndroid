@@ -12,6 +12,7 @@ import com.huangxiaowei.wanandroid.adaptor.ImageAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerItem
+import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.ui.view.SuperListView
 import com.youth.banner.Banner
 import com.youth.banner.indicator.CircleIndicator
@@ -37,6 +38,7 @@ class  HomeFragment:BaseFragment(){
     }
 
     private fun showArticleList(){
+
         updateArticleList()
     }
 
@@ -84,6 +86,13 @@ class  HomeFragment:BaseFragment(){
                }else {
                    articleAdapter!!.addList(bean)
                }
+
+               bottom_tip.visibility = View.INVISIBLE
+               if (page!=0){
+                   articleList.smoothScrollByOffset(1)//向下滑动一格
+               }
+
+               showToast("加载完毕")
            }
     }
 
@@ -136,6 +145,7 @@ class  HomeFragment:BaseFragment(){
             override fun onTop() {}
 
             override fun onBottom() {
+                bottom_tip.visibility = View.VISIBLE
                 updateArticleList(++page)//加载更多
             }
 

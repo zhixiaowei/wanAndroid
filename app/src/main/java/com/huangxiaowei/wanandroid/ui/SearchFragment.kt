@@ -51,6 +51,7 @@ class SearchFragment:BaseFragment(){
             override fun onTop() {}
 
             override fun onBottom() {
+                bottom_tip.visibility = View.VISIBLE
                 updateArticleList(++mPage)//加载更多
             }
 
@@ -74,6 +75,8 @@ class SearchFragment:BaseFragment(){
             }else {
                 articleAdapter!!.addList(bean)
             }
+
+//            bottom_tip.visibility = View.INVISIBLE
         }
     }
 
