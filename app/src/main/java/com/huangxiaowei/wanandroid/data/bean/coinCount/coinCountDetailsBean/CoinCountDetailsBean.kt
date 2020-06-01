@@ -2,7 +2,7 @@ package com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean
 
 data class CoinCountDetailsBean(
     val curPage: Int,
-    val datas: List<Data>,
+    val datas: List<CoinCountDetailsItemBean>,
     val offset: Int,
     val over: Boolean,
     val pageCount: Int,

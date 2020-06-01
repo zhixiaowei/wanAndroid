@@ -1,6 +1,6 @@
 package com.huangxiaowei.wanandroid.data.bean.articleListBean
 
-data class DataX(
+data class ArticleBean(
     val apkLink: String,
     val audit: Int,
     val author: String,//如果文章为分享，那么该值为null，应该取分享者的名字

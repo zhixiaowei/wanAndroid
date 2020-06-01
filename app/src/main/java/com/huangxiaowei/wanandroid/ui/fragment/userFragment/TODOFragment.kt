@@ -1,4 +1,4 @@
-package com.huangxiaowei.wanandroid.ui.userFragment
+package com.huangxiaowei.wanandroid.ui.fragment.userFragment
 
 import android.os.Bundle
 import android.view.View
@@ -9,7 +9,7 @@ import com.huangxiaowei.wanandroid.client.RequestCtrl.TODO
 import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
 import com.huangxiaowei.wanandroid.ui.BaseFragment
-import com.huangxiaowei.wanandroid.ui.view.AddTodoDialog
+import com.huangxiaowei.wanandroid.ui.dialog.AddTodoDialog
 import kotlinx.android.synthetic.main.fragment_user_todo.*
 
 class TODOFragment :BaseFragment(),OnItemClickListener {
@@ -126,15 +126,19 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
         addTodoBtn.setOnClickListener {
             showToast("打开一个页面用来添加TODO")
 
-            val d = AddTodoDialog(object:AddTodoDialog.IDialogClickCallback{
-                override fun onComfig(dialog: AddTodoDialog,todo:TodoBean) {
-                    TODO.add(todo.title,todo.content,todo.completeDateStr){
+            val d = AddTodoDialog(object :
+                AddTodoDialog.IDialogClickCallback {
+                override fun onComfig(
+                    dialog: AddTodoDialog,
+                    todo: TodoBean
+                ) {
+                    TODO.add(todo.title, todo.content, todo.completeDateStr) {
 
-                        if (it){
+                        if (it) {
                             showToast("添加成功！")
                             adapter?.addList(listOf(todo))
                             dialog.dismiss()
-                        }else{
+                        } else {
                             showToast("添加失败！")
                         }
                     }

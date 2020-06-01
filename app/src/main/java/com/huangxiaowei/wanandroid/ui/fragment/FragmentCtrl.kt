@@ -1,4 +1,4 @@
-package com.huangxiaowei.wanandroid.ui
+package com.huangxiaowei.wanandroid.ui.fragment
 
 import android.os.Bundle
 import android.util.ArrayMap
@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.huangxiaowei.wanandroid.R
+import com.huangxiaowei.wanandroid.ui.BaseFragment
 import kotlin.Exception
 
 class FragmentCtrl{
@@ -16,11 +17,12 @@ class FragmentCtrl{
 
     private var currentFragment:Fragment? = null//当前正在显示Fragment
     private lateinit var fragmentManager: FragmentManager
-    private lateinit var list:ArrayMap<String,BaseFragment>
+    private lateinit var list:ArrayMap<String, BaseFragment>
 
     private val stackList = ArrayList<String>()//Fragment栈管理
 
-    private val executor = object:BaseFragment.OnFragmentRequestCallback{
+    private val executor = object:
+        BaseFragment.OnFragmentRequestCallback {
         override fun onStartFragment(tag: String) {
             showFragment(tag)
         }
@@ -40,7 +42,7 @@ class FragmentCtrl{
      */
     fun onCreate(activity: AppCompatActivity
                  ,savedInstanceState: Bundle?
-                 ,list:ArrayMap<String,BaseFragment>//Fragment及对应的TAG
+                 ,list:ArrayMap<String, BaseFragment>//Fragment及对应的TAG
                  ,default:String?//默认显示的Fragment的TAG
                  ){
 
@@ -55,7 +57,7 @@ class FragmentCtrl{
      */
     fun onCreate(fragment: BaseFragment
                  ,savedInstanceState: Bundle?
-                 ,list:ArrayMap<String,BaseFragment>//Fragment及对应的TAG
+                 ,list:ArrayMap<String, BaseFragment>//Fragment及对应的TAG
                  ,default:String?//默认显示的Fragment的TAG
                  ){
         fragmentManager = fragment.childFragmentManager

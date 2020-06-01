@@ -1,4 +1,4 @@
-package com.huangxiaowei.wanandroid.ui.view
+package com.huangxiaowei.wanandroid.ui.dialog
 
 import android.app.DatePickerDialog
 import android.content.Context
@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.dialog_add_todo.*
 import java.util.*
 
 
-class AddTodoDialog(private val callback:IDialogClickCallback?):DialogFragment(){
+class AddTodoDialog(private val callback: IDialogClickCallback?):DialogFragment(){
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -77,7 +77,7 @@ class AddTodoDialog(private val callback:IDialogClickCallback?):DialogFragment()
     }
 
     interface IDialogClickCallback{
-        fun onComfig(dialog: AddTodoDialog,todo:TodoBean)
+        fun onComfig(dialog: AddTodoDialog, todo:TodoBean)
         fun onCancle()
     }
 

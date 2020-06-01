@@ -1,6 +1,6 @@
 package com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean
 
-data class Data(
+data class CoinCountDetailsItemBean(
     val coinCount: Int,
     val date: Long,
     val desc: String,

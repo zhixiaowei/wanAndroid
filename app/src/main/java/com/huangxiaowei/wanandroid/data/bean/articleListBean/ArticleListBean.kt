@@ -2,7 +2,7 @@ package com.huangxiaowei.wanandroid.data.bean.articleListBean
 
 data class ArticleListBean(
     val curPage: Int = 0,
-    val datas: List<DataX> = arrayListOf(),
+    val datas: List<ArticleBean> = arrayListOf(),
     val offset: Int = 0,
     val over: Boolean = false,
     val pageCount: Int = 0,

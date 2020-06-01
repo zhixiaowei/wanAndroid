@@ -16,16 +16,14 @@
         android:src="@drawable/back_top"
         />
 
-    <TextView
+    <ProgressBar
         android:id="@+id/bottom_tip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="哎呀,触底了,正在加载中"
-        android:textSize="20dp"
-        android:layout_gravity="bottom"
-        android:gravity="center"
+        android:background="#FFFFFF"
         android:visibility="invisible"
-        android:background="#60000000"
+        android:padding="10dp"
+        android:layout_gravity="center|bottom"
         />
 
     <com.huangxiaowei.wanandroid.ui.view.WSwipeRefreshLayout

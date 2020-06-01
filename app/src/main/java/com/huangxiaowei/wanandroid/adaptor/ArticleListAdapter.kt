@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
-import com.huangxiaowei.wanandroid.data.bean.articleListBean.DataX
+import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleBean
 
 class ArticleListAdapter(private val context: Context,listBean: ArticleListBean):BaseAdapter(){
 
@@ -92,7 +92,7 @@ class ArticleListAdapter(private val context: Context,listBean: ArticleListBean)
         lateinit var like:ImageView
     }
 
-    override fun getItem(position: Int): DataX =  list[position]
+    override fun getItem(position: Int): ArticleBean =  list[position]
     override fun getItemId(position: Int): Long =  position.toLong()
     override fun getCount(): Int = list.size
 

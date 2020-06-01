@@ -5,14 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.huangxiaowei.wanandroid.R
-import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
-import com.huangxiaowei.wanandroid.data.bean.articleListBean.DataX
-import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectActicleListBean
-import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.Data
+import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
+import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectItemBean
 
-class CollectArticleListAdapter(private val context: Context, listBean: CollectActicleListBean):BaseAdapter(){
+class CollectArticleListAdapter(private val context: Context, listBean: CollectArticleListBean):BaseAdapter(){
 
     private val list = ArrayList(listBean.datas)
 
@@ -43,7 +40,7 @@ class CollectArticleListAdapter(private val context: Context, listBean: CollectA
     /**
      * 添加列表
      */
-    fun addList(articleListBean: CollectActicleListBean){
+    fun addList(articleListBean: CollectArticleListBean){
         list.addAll(articleListBean.datas)
         notifyDataSetChanged()
     }
@@ -58,7 +55,7 @@ class CollectArticleListAdapter(private val context: Context, listBean: CollectA
         lateinit var time:TextView
     }
 
-    override fun getItem(position: Int): Data =  list[position]
+    override fun getItem(position: Int): CollectItemBean =  list[position]
     override fun getItemId(position: Int): Long =  position.toLong()
     override fun getCount(): Int = list.size
 

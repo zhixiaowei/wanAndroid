@@ -1,8 +1,8 @@
 package com.huangxiaowei.wanandroid.data.bean.collectArticleListBean
 
-data class CollectActicleListBean(
+data class CollectArticleListBean(
     val curPage: Int = 0,
-    val datas: List<Data> = mutableListOf(),
+    val datas: List<CollectItemBean> = mutableListOf(),
     val offset: Int =0,
     val over: Boolean =false,
     val pageCount: Int =0,

@@ -1,4 +1,4 @@
-package com.huangxiaowei.wanandroid.ui.userFragment
+package com.huangxiaowei.wanandroid.ui.fragment.userFragment
 
 import android.os.Bundle
 import android.view.View
@@ -6,9 +6,8 @@ import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.WebActivity
 import com.huangxiaowei.wanandroid.adaptor.CollectArticleListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
-import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectActicleListBean
+import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
 import com.huangxiaowei.wanandroid.ui.BaseFragment
-import kotlinx.android.synthetic.main.fragment_user_collect.*
 import kotlinx.android.synthetic.main.include_article_list.*
 
 class CollectArticlesFragment: BaseFragment() {
@@ -20,7 +19,7 @@ class CollectArticlesFragment: BaseFragment() {
         RequestCtrl.requestCollectArticles(0){
                 isLoginInvalid:Boolean,
                 returnPage:Int,
-                bean: CollectActicleListBean ->
+                bean: CollectArticleListBean ->
 
             if (isLoginInvalid){
                 return@requestCollectArticles

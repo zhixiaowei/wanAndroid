@@ -1,22 +1,23 @@
-package com.huangxiaowei.wanandroid.ui
+package com.huangxiaowei.wanandroid.ui.fragment
 
 import android.os.Bundle
 import android.util.ArrayMap
 import android.view.View
-import androidx.fragment.app.Fragment
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.globalStatus.KeyEventManager
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.ui.userFragment.CoinCountDetailsFragment
-import com.huangxiaowei.wanandroid.ui.userFragment.CollectArticlesFragment
-import com.huangxiaowei.wanandroid.ui.userFragment.TODOFragment
-import com.huangxiaowei.wanandroid.ui.userFragment.UserMainFragment
+import com.huangxiaowei.wanandroid.ui.BaseFragment
+import com.huangxiaowei.wanandroid.ui.fragment.userFragment.CoinCountDetailsFragment
+import com.huangxiaowei.wanandroid.ui.fragment.userFragment.CollectArticlesFragment
+import com.huangxiaowei.wanandroid.ui.fragment.userFragment.TODOFragment
+import com.huangxiaowei.wanandroid.ui.fragment.userFragment.UserMainFragment
 
-class UserFragment:BaseFragment(),View.OnClickListener{
+class UserFragment: BaseFragment(),View.OnClickListener{
 
-    private val fragmentCtrl = FragmentCtrl()//fragment的显示及隐藏，重建的管理类
+    private val fragmentCtrl =
+        FragmentCtrl()//fragment的显示及隐藏，重建的管理类
 
     private val KEY_USER = "KEY_USER"//用户
     private val KEY_COLLECT = "KEY_COLLECT"//收藏文章
@@ -28,7 +29,7 @@ class UserFragment:BaseFragment(),View.OnClickListener{
     }
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
-        val list = ArrayMap<String,BaseFragment>()
+        val list = ArrayMap<String, BaseFragment>()
         list[KEY_USER] = UserMainFragment(this)
         list[KEY_COLLECT] = CollectArticlesFragment()
         list[KEY_TODO] = TODOFragment()

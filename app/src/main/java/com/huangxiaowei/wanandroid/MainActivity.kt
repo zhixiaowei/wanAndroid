@@ -6,14 +6,13 @@ import android.util.ArrayMap
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.globalStatus.KeyEventManager
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.ui.*
+import com.huangxiaowei.wanandroid.ui.fragment.*
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
 
 class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
 
@@ -39,7 +38,8 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
         const val TAG_SEARCH = "TAG_SEARCH"
     }
 
-    private val fragmentCtrl = FragmentCtrl()//fragment的显示及隐藏，重建的管理类
+    private val fragmentCtrl =
+        FragmentCtrl()//fragment的显示及隐藏，重建的管理类
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

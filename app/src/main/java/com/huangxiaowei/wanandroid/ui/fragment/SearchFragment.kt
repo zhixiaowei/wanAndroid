@@ -1,17 +1,24 @@
-package com.huangxiaowei.wanandroid.ui
+package com.huangxiaowei.wanandroid.ui.fragment
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
+import android.widget.TextView
+import androidx.core.view.setPadding
 import com.huangxiaowei.wanandroid.R
+import com.huangxiaowei.wanandroid.WebActivity
 import com.huangxiaowei.wanandroid.adaptor.ArticleListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.showToast
+import com.huangxiaowei.wanandroid.ui.BaseFragment
 import com.huangxiaowei.wanandroid.ui.view.SuperListView
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.include_article_list.*
 
-class SearchFragment:BaseFragment(){
+class SearchFragment: BaseFragment(){
+
     override fun getLayout(): Int {
         return R.layout.fragment_search
     }
@@ -57,6 +64,24 @@ class SearchFragment:BaseFragment(){
 
         })
 
+        RequestCtrl.requeryHotKey {
+            for(item in it.data){
+
+                val hotKeyTv = TextView(attackActivity)
+                hotKeyTv.textSize = 25f
+                hotKeyTv.isClickable = true
+
+                hotKeyTv.text = item.name
+
+                hotKeyTv.setOnClickListener {
+                    showToast(item.link)
+                    WebActivity.startActivity(attackActivity,item.link)
+                }
+
+                hotKeyTv.setPadding(15)
+                tagLayout.addView(hotKeyTv)
+            }
+        }
     }
 
     private fun updateArticleList(page: Int = 0,searchText:String = this.searchText) {
@@ -76,7 +101,7 @@ class SearchFragment:BaseFragment(){
                 articleAdapter!!.addList(bean)
             }
 
-//            bottom_tip.visibility = View.INVISIBLE
+            bottom_tip.visibility = View.INVISIBLE
         }
     }
 

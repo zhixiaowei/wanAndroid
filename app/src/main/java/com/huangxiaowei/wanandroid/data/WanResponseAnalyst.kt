@@ -9,7 +9,8 @@ import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.Coin
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
-import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectActicleListBean
+import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
+import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
 
 @Suppress("UNCHECKED_CAST")
@@ -46,11 +47,12 @@ class WanResponseAnalyst(private val json:String){
             CoinCountBean::class.java,
             CoinCountDetailsBean::class.java,
             UserBean::class.java,
-            CollectActicleListBean::class.java,
+            CollectArticleListBean::class.java,
             ArticleListBean::class.java,
             QueryTodoBean::class.java
                 -> JSON.parseObject(getData(),clazz) as T
-            BannerBean::class.java
+            BannerBean::class.java,
+            HotKeyBean::class.java
                 -> JSON.parseObject(json,clazz) as T
             else -> null
         }

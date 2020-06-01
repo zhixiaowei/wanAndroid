@@ -1,4 +1,4 @@
-package com.huangxiaowei.wanandroid.ui.userFragment
+package com.huangxiaowei.wanandroid.ui.fragment.userFragment
 
 import android.os.Bundle
 import android.view.View

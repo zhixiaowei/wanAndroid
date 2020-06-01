@@ -5,12 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
 import com.huangxiaowei.wanandroid.R
-import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
-import com.huangxiaowei.wanandroid.data.bean.articleListBean.DataX
 import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.CoinCountDetailsBean
-import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.Data
+import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.CoinCountDetailsItemBean
 
 class CoinDetailsListAdapter(private val context: Context, listBean: CoinCountDetailsBean):BaseAdapter(){
 
@@ -52,7 +49,7 @@ class CoinDetailsListAdapter(private val context: Context, listBean: CoinCountDe
         lateinit var details:TextView
     }
 
-    override fun getItem(position: Int): Data =  list[position]
+    override fun getItem(position: Int): CoinCountDetailsItemBean =  list[position]
     override fun getItemId(position: Int): Long =  position.toLong()
     override fun getCount(): Int = list.size
 

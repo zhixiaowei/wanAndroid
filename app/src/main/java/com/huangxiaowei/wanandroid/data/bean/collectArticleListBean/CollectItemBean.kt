@@ -1,6 +1,6 @@
 package com.huangxiaowei.wanandroid.data.bean.collectArticleListBean
 
-data class Data(
+data class CollectItemBean(
     val author: String,
     val chapterId: Int,
     val chapterName: String,

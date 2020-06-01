@@ -1,7 +1,6 @@
 package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
-import com.alibaba.fastjson.JSONObject
 import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.WanResponseAnalyst
 import com.huangxiaowei.wanandroid.data.bean.UserBean
@@ -9,7 +8,8 @@ import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
 import com.huangxiaowei.wanandroid.data.bean.coinCount.CoinCountBean
 import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.CoinCountDetailsBean
-import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectActicleListBean
+import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
+import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.globalStatus.ioScope
@@ -244,7 +244,7 @@ object RequestCtrl {
     /**
      * 请求收藏的文章
      */
-    fun requestCollectArticles(page:Int,callback:(isLoginInvalid:Boolean,page:Int,reply:CollectActicleListBean)->Unit){
+    fun requestCollectArticles(page:Int,callback:(isLoginInvalid:Boolean,page:Int,reply:CollectArticleListBean)->Unit){
         ioScope.launch {
             httpClient.doGet("$baseUrl/lg/collect/list/$page/json",object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
@@ -253,12 +253,12 @@ object RequestCtrl {
                     when {
                         response.isSuccess() -> {
 
-                            val bean = response.parseObject(CollectActicleListBean::class.java)!!
+                            val bean = response.parseObject(CollectArticleListBean::class.java)!!
                             uiScope.launch { callback(false,page,bean) }//更新UI
                         }
                         response.isLoginInvalid() -> {
                             LoginStateManager.loginInvalid()
-                            uiScope.launch { callback(true,page,CollectActicleListBean()) }
+                            uiScope.launch { callback(true,page,CollectArticleListBean()) }
                         }
                         else -> {
                             uiScope.launch { showToast(response.getErrorMsg()) }
@@ -274,7 +274,7 @@ object RequestCtrl {
                     e.printStackTrace()
 
                     //请求服务器返回异常，则加载本地数据
-                    val bean = CollectActicleListBean()
+                    val bean = CollectArticleListBean()
 
                     uiScope.launch {
 //                        showToast("访问服务器失败，请检查网络状态是否正常")
@@ -353,6 +353,33 @@ object RequestCtrl {
             }
         })
 
+    }
+
+    /**
+     * 获取搜索热词
+     */
+    fun requeryHotKey(callback: (bean:HotKeyBean) -> Unit){
+        val url = "$baseUrl//hotkey/json"
+        httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+            override fun onError(e: Exception, response: String) {
+
+            }
+
+            override fun onSuccess(json: String) {
+                val reply = WanResponseAnalyst(json)
+
+                uiScope.launch {
+                    if (reply.isSuccess()){
+                        val bean = reply.parseObject(HotKeyBean::class.java)
+                        callback(bean!!)
+                    }else{
+
+                    }
+                }
+
+            }
+
+        })
     }
 
     /**
