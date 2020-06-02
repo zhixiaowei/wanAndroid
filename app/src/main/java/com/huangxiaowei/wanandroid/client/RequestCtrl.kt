@@ -330,6 +330,7 @@ object RequestCtrl {
     }
 
     fun requestSearch(msg:String,page:Int = 0,callback: (page: Int, reply: ArticleListBean) -> Unit){
+
         val url = "$baseUrl/article/query/$page/json"
 
         val form = ArrayMap<String,String>()

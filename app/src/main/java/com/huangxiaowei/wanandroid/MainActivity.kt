@@ -98,7 +98,12 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
     override fun onBackPressed() {
         //如果未消耗该事件，那么不执行默认
         if (!KeyEventManager.onBackPress()){
-            super.onBackPressed()
+            return if (fragmentCtrl.getCurrentFragment()?.tag == TAG_HOME){
+                super.onBackPressed()
+            }else{
+                //仅当当前显示，且显示的不为用户信息主页面时消化该事件，回到用户主页
+                fragmentCtrl.showFragment(TAG_HOME)
+            }
         }
     }
 

@@ -38,18 +38,15 @@ class UserFragment: BaseFragment(),View.OnClickListener{
         fragmentCtrl.onCreate(this,savedInstanceState,list,KEY_USER)
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onBackPressed(): Boolean {
 
-        KeyEventManager.setOnBackPress{
-            when {
-                isHidden -> false
-                fragmentCtrl.getCurrentFragment()?.tag == KEY_USER -> false
-                else -> {
-                    fragmentCtrl.showFragment(KEY_USER)
-                    true
-                }
-            }
+        showToast(fragmentCtrl.getCurrentFragment()?.tag!!)
+        return if (isHidden||fragmentCtrl.getCurrentFragment()?.tag == KEY_USER){
+            super.onBackPressed()
+        }else{
+            //仅当当前显示，且显示的不为用户信息主页面时消化该事件，回到用户主页
+            fragmentCtrl.showFragment(KEY_USER)
+            true
         }
     }
 

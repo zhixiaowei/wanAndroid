@@ -3,11 +3,9 @@ package com.huangxiaowei.wanandroid.ui.fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.setPadding
 import com.huangxiaowei.wanandroid.R
-import com.huangxiaowei.wanandroid.WebActivity
 import com.huangxiaowei.wanandroid.adaptor.ArticleListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
@@ -16,6 +14,7 @@ import com.huangxiaowei.wanandroid.ui.BaseFragment
 import com.huangxiaowei.wanandroid.ui.view.SuperListView
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.include_article_list.*
+import android.view.ViewGroup
 
 class SearchFragment: BaseFragment(){
 
@@ -36,6 +35,7 @@ class SearchFragment: BaseFragment(){
                 return@setOnClickListener
             }
 
+            search_tv.setText(text)
             updateArticleList(0,text)
         }
 
@@ -67,24 +67,47 @@ class SearchFragment: BaseFragment(){
         RequestCtrl.requeryHotKey {
             for(item in it.data){
 
-                val hotKeyTv = TextView(attackActivity)
-                hotKeyTv.textSize = 25f
-                hotKeyTv.isClickable = true
+                val layout = LayoutInflater.from(attackActivity).inflate(R.layout.item_hotkey,null) as LinearLayout
+                val hotKeyTv = layout.findViewById<TextView>(R.id.hotkeyTv)
 
                 hotKeyTv.text = item.name
 
                 hotKeyTv.setOnClickListener {
-                    showToast(item.link)
-                    WebActivity.startActivity(attackActivity,item.link)
+                    updateArticleList(0,item.name)
                 }
 
-                hotKeyTv.setPadding(15)
+                if (hotKeyTv.parent != null){
+                    val parent = hotKeyTv.parent as ViewGroup
+                    parent.removeAllViews()
+                }
+
                 tagLayout.addView(hotKeyTv)
             }
         }
     }
 
+    /**
+     * 返回键监听
+     */
+    override fun onBackPressed(): Boolean {
+
+        return if (isHidden||tagLayout.visibility == View.VISIBLE){
+            super.onBackPressed()
+        }else{
+            //如果执行返回键且当前正显示检索内容，则清空检索列表，重新显示热门标签
+            tagLayout.visibility = View.VISIBLE
+            articleAdapter?.apply {
+                clear()
+                notifyDataSetChanged()
+            }
+            true
+        }
+    }
+
     private fun updateArticleList(page: Int = 0,searchText:String = this.searchText) {
+        tagLayout.visibility = View.GONE
+        bottom_tip.visibility = View.VISIBLE
+
         RequestCtrl.requestSearch(searchText,page){returnPage: Int, bean: ArticleListBean ->
 
             this.mPage = returnPage
@@ -104,6 +127,8 @@ class SearchFragment: BaseFragment(){
             bottom_tip.visibility = View.INVISIBLE
         }
     }
+
+
 
 
 }
