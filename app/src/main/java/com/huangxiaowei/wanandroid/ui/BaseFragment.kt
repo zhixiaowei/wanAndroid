@@ -2,12 +2,13 @@ package com.huangxiaowei.wanandroid.ui
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.huangxiaowei.wanandroid.globalStatus.KeyEventManager
+import com.huangxiaowei.wanandroid.log
 
 abstract class BaseFragment:Fragment(){
     lateinit var attackActivity: AppCompatActivity
@@ -30,6 +31,7 @@ abstract class BaseFragment:Fragment(){
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        log("${tag}:onViewCreated","fragment")
         super.onViewCreated(view, savedInstanceState)
         onCreated(view, savedInstanceState)
     }
@@ -37,11 +39,6 @@ abstract class BaseFragment:Fragment(){
     override fun onAttach(context: Context) {
         super.onAttach(context)
         attackActivity = context as AppCompatActivity
-    }
-
-    override fun onStart() {
-        super.onStart()
-        KeyEventManager.setOnBackPress { onBackPressed() }//监听返回键
     }
 
     /**
@@ -67,6 +64,16 @@ abstract class BaseFragment:Fragment(){
     open fun onBackPressed():Boolean{
         //默认返回false，即不消化该事件
         return false
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+
+        if (hidden){
+            log("${tag}:onHidden","fragment")
+        }else{
+            log("${tag}:onShow","fragment")
+        }
     }
 
     interface OnFragmentRequestCallback{

@@ -35,7 +35,7 @@
             android:id="@+id/articleList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/article_item"
+            tools:listitem="@layout/item_article"
             />
 
     </com.huangxiaowei.wanandroid.ui.view.WSwipeRefreshLayout>

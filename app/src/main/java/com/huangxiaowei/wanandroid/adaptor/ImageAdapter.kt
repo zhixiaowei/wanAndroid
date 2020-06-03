@@ -20,7 +20,7 @@ class ImageAdapter(private val context: Context, bean: BannerBean) :
     private val list: List<BannerItem> = bean.data
 
     override fun onCreateHolder(parent: ViewGroup, viewType: Int): BannerViewHolder {
-        val view = mLayoutInflater.inflate(R.layout.banner_item, parent, false)
+        val view = mLayoutInflater.inflate(R.layout.item_banner, parent, false)
         return BannerViewHolder(view)
     }
 

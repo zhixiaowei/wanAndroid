@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.WebActivity
 import com.huangxiaowei.wanandroid.adaptor.ArticleListAdapter
@@ -15,7 +14,6 @@ import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerItem
 import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.ui.BaseFragment
-import com.huangxiaowei.wanandroid.ui.dialog.BottomTipDialog
 import com.huangxiaowei.wanandroid.ui.view.SuperListView
 import com.youth.banner.Banner
 import com.youth.banner.indicator.CircleIndicator
@@ -112,7 +110,7 @@ class  HomeFragment: BaseFragment(){
     @SuppressLint("InflateParams")
     private fun initView() {
 
-        bannerView = layoutInflater.inflate(R.layout.banner,null) as Banner<*, *>
+        bannerView = layoutInflater.inflate(R.layout.view_banner,null) as Banner<*, *>
 
         bannerView.run {
             indicator = CircleIndicator(attackActivity)//Banner下方显示N个小圆点

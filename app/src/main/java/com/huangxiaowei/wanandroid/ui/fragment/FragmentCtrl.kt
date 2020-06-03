@@ -15,7 +15,7 @@ class FragmentCtrl{
         const val KEY_TAG = "KEY_TAG"
     }
 
-    private var currentFragment:Fragment? = null//当前正在显示Fragment
+    private var currentFragment:BaseFragment? = null//当前正在显示Fragment
     private lateinit var fragmentManager: FragmentManager
     private lateinit var list:ArrayMap<String, BaseFragment>
 
@@ -77,7 +77,7 @@ class FragmentCtrl{
             showFragment(default)
         }else{
             val tag = savedInstanceState.getString(KEY_TAG)?:default
-            currentFragment = fragmentManager.findFragmentByTag(tag)
+            currentFragment = fragmentManager.findFragmentByTag(tag) as BaseFragment
 
             if (currentFragment!=null){
                 addStack(tag)
@@ -121,7 +121,7 @@ class FragmentCtrl{
                 .commit()
         }
 
-        currentFragment = temp
+        currentFragment = temp as BaseFragment
 
        addStack(tag)
     }
@@ -148,4 +148,33 @@ class FragmentCtrl{
 
         stackList.add(0,tag)
     }
+
+    //监听返回键
+    fun onBackPressed():Boolean{
+        return currentFragment?.onBackPressed()?:false
+    }
+
+    class ConfigBuilder{
+
+        private val config = Config()
+
+        fun addList(list:ArrayMap<String, BaseFragment>):ConfigBuilder{
+            config.list = list
+            return this
+        }
+
+        fun mainFragment(tag:String):ConfigBuilder{
+            config.mainFragment = tag
+            return this
+        }
+
+        fun build():Config{
+            return Config(config.list,config.mainFragment)
+        }
+    }
+
+    data class Config(
+       var list:ArrayMap<String, BaseFragment>? = null,
+       var mainFragment:String = ""
+    )
 }

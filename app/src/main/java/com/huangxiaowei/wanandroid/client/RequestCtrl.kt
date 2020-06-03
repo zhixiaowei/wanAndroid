@@ -11,6 +11,9 @@ import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.Coin
 import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
+import com.huangxiaowei.wanandroid.data.bean.weChatListBean.WeChatListBean
+import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListBean
+import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListData
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.globalStatus.ioScope
 import com.huangxiaowei.wanandroid.globalStatus.uiScope
@@ -409,7 +412,59 @@ object RequestCtrl {
         })
     }
 
+    object WeChat{
 
+        /**
+         * 获取公众号列表
+         */
+        fun requestWeChatList(callback: (bean:WeChatListBean) -> Unit){
+            val url = "$baseUrl/wxarticle/chapters/json"
+            httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+                override fun onError(e: Exception, response: String) {
+
+                }
+
+                override fun onSuccess(json: String) {
+
+                    uiScope.launch {
+                        val reply = WanResponseAnalyst(json)
+                        if (reply.isSuccess()){
+                            callback(reply.parseObject(WeChatListBean::class.java)!!)
+                        }
+                    }
+
+                }
+            })
+        }
+
+        fun requestHistory(id:Int,page:Int = 1,key: String? = null,callback: (bean: WeChatArticleListBean) -> Unit){
+            val url = "$baseUrl/wxarticle/list/$id/$page/json"+if (key != null){
+                "?k=$key"
+            }else{
+                ""
+            }
+
+            httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+                override fun onError(e: Exception, response: String) {
+
+                }
+
+                override fun onSuccess(json: String) {
+                    val reply = WanResponseAnalyst(json)
+
+                    uiScope.launch {
+                        if (reply.isSuccess()){
+                            val bean = reply.parseObject(WeChatArticleListBean::class.java)
+                            callback(bean!!)
+                        }
+                    }
+
+                }
+
+            })
+
+        }
+    }
 
     object TODO{
         const val ORDER_FINISH_DATE_POSITIVE = 1//完成日期顺序

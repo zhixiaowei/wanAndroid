@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
-import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.ui.BaseFragment
@@ -33,17 +32,11 @@ class UserMainFragment(private val onAgentClickListener: View.OnClickListener):B
         logoutBtn.setOnClickListener(onAgentClickListener)
         coinCount.setOnClickListener(onAgentClickListener)
         todo.setOnClickListener(onAgentClickListener)
-        LoginStateManager.addLoginStateListener(true,this.javaClass.name,this)
 
         RequestCtrl.requestCoinCount {
             it?.apply {
                 this@UserMainFragment.coinCount.text = coinCount.toString()
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        LoginStateManager.removeLoginStateListener(this.javaClass.name)
     }
 }

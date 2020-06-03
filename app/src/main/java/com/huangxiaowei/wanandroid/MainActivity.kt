@@ -5,30 +5,16 @@ import android.os.Bundle
 import android.util.ArrayMap
 import android.view.View
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
-import com.huangxiaowei.wanandroid.globalStatus.KeyEventManager
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.ui.*
 import com.huangxiaowei.wanandroid.ui.fragment.*
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
+class MainActivity : BaseFragmentActivity(),View.OnClickListener,IOnLoginCallback{
 
     private lateinit var bottomBtn:Array<Button>//底部的按钮
-
-    override fun onLoginInvalid() {
-        fragmentCtrl.showFragment(TAG_LOGIN)
-    }
-
-    override fun onLogin(user: UserBean) {
-        //登签成功，进入个人信息页面
-        fragmentCtrl.showFragment(TAG_USER)
-    }
-
-    override fun onLogout() {
-    }
 
     companion object{
         const val TAG_HOME = "TAG_HOME"
@@ -38,16 +24,9 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
         const val TAG_SEARCH = "TAG_SEARCH"
     }
 
-    private val fragmentCtrl =
-        FragmentCtrl()//fragment的显示及隐藏，重建的管理类
+    override fun getLayoutID() = R.layout.activity_main
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        bottomBtn = arrayOf(main_home,main_user,main_weChat,main_square)
-        updateBottomBtnStatus(main_home)
-
+    override fun getFragmentConfig(): FragmentCtrl.Config {
         val map = ArrayMap<String,BaseFragment>()
         map[TAG_HOME] = HomeFragment()
         map[TAG_WE_CHAT] = WeChatFragment()
@@ -55,27 +34,44 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
         map[TAG_LOGIN] = LoginFragment()
         map[TAG_SEARCH] = SearchFragment()
 
-        fragmentCtrl.onCreate(this ,savedInstanceState
-            ,map, TAG_HOME)
+        return FragmentCtrl.ConfigBuilder()
+                    .addList(map)
+                    .mainFragment(TAG_HOME)
+                    .build()
+    }
 
-        LoginStateManager.addLoginStateListener(false,this.javaClass.name,this)
+    override fun onLoginInvalid() {
+        showFragment(TAG_LOGIN)
+    }
+
+    override fun onLogin(user: UserBean) {
+        //登签成功，进入个人信息页面
+        showFragment(TAG_USER)
+    }
+
+    override fun onLogout() {
+    }
+
+    override fun onCreated(savedInstanceState: Bundle?) {
+        bottomBtn = arrayOf(main_home,main_user,main_weChat,main_square)
+        updateBottomBtnStatus(main_home)
     }
 
     override fun onClick(view: View) {
-        updateBottomBtnStatus(view)
+        updateBottomBtnStatus(view)//更新按钮显示状态
 
         when(view.id){
             R.id.main_home ->
-                fragmentCtrl.showFragment(TAG_HOME)
+                showFragment(TAG_HOME)
             R.id.main_square ->
-                fragmentCtrl.showFragment(TAG_SEARCH)
+                showFragment(TAG_SEARCH)
             R.id.main_weChat->
-                fragmentCtrl.showFragment(TAG_WE_CHAT)
+                showFragment(TAG_WE_CHAT)
             R.id.main_user->
                 if (LoginStateManager.isLogin){
-                    fragmentCtrl.showFragment(TAG_USER)
+                    showFragment(TAG_USER)
                 }else{
-                    fragmentCtrl.showFragment(TAG_LOGIN)
+                    showFragment(TAG_LOGIN)
                 }
         }
     }
@@ -93,22 +89,5 @@ class MainActivity : AppCompatActivity(),View.OnClickListener,IOnLoginCallback{
                 }
             }
         }
-    }
-
-    override fun onBackPressed() {
-        //如果未消耗该事件，那么不执行默认
-        if (!KeyEventManager.onBackPress()){
-            return if (fragmentCtrl.getCurrentFragment()?.tag == TAG_HOME){
-                super.onBackPressed()
-            }else{
-                //仅当当前显示，且显示的不为用户信息主页面时消化该事件，回到用户主页
-                fragmentCtrl.showFragment(TAG_HOME)
-            }
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        fragmentCtrl.onSaveInstanceState(outState)
-        super.onSaveInstanceState(outState)
     }
 }

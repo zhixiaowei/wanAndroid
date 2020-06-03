@@ -6,10 +6,21 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <ImageView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weChatTitleList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/ic_launcher_background"
+        android:layout_height="wrap_content"
         />
+
+    <com.huangxiaowei.wanandroid.ui.view.SuperListView
+        android:id="@+id/weChatArticleList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+
+    </com.huangxiaowei.wanandroid.ui.view.SuperListView>
+
+
 
 </LinearLayout>

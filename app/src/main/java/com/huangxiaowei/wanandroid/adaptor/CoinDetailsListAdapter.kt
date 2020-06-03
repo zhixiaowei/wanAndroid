@@ -18,7 +18,7 @@ class CoinDetailsListAdapter(private val context: Context, listBean: CoinCountDe
         val holder:ViewHolder
 
         if (convertView==null){
-            tempView = View.inflate(context, R.layout.coin_item, null)
+            tempView = View.inflate(context, R.layout.item_coin, null)
             holder = ViewHolder()
             holder.details = tempView.findViewById(R.id.coinDetails) as TextView
             tempView.tag = holder

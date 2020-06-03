@@ -10,10 +10,11 @@ import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleBean
+import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WechatArticleItem
 
-class ArticleListAdapter(private val context: Context,listBean: ArticleListBean):BaseAdapter(){
+class WeChatArticleListAdapter(private val context: Context,val articleList:List<WechatArticleItem>):BaseAdapter(){
 
-    private val list = ArrayList(listBean.datas)
+    private val list = ArrayList(articleList)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
         val tempView:View
@@ -76,8 +77,8 @@ class ArticleListAdapter(private val context: Context,listBean: ArticleListBean)
     /**
      * 添加列表
      */
-    fun addList(articleListBean: ArticleListBean){
-        list.addAll(articleListBean.datas)
+    fun addList(temp: List<WechatArticleItem>){
+        list.addAll(temp)
         notifyDataSetChanged()
     }
 
@@ -92,7 +93,7 @@ class ArticleListAdapter(private val context: Context,listBean: ArticleListBean)
         lateinit var like:ImageView
     }
 
-    override fun getItem(position: Int): ArticleBean =  list[position]
+    override fun getItem(position: Int): WechatArticleItem =  list[position]
     override fun getItemId(position: Int): Long =  position.toLong()
     override fun getCount(): Int = list.size
 

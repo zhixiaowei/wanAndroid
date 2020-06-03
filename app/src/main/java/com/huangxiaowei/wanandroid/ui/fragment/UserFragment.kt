@@ -5,8 +5,8 @@ import android.util.ArrayMap
 import android.view.View
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
-import com.huangxiaowei.wanandroid.globalStatus.KeyEventManager
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
+import com.huangxiaowei.wanandroid.log
 import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.ui.BaseFragment
 import com.huangxiaowei.wanandroid.ui.fragment.userFragment.CoinCountDetailsFragment
@@ -19,10 +19,10 @@ class UserFragment: BaseFragment(),View.OnClickListener{
     private val fragmentCtrl =
         FragmentCtrl()//fragment的显示及隐藏，重建的管理类
 
-    private val KEY_USER = "KEY_USER"//用户
-    private val KEY_COLLECT = "KEY_COLLECT"//收藏文章
-    private val KEY_TODO = "KEY_TODO"//todoView
-    private val KEY_COIN_DETAILS = "KEY_COIN_DETAILS"//硬币详情
+    private val TAG_USER_MAIN = "TAG_USER_MAIN"//用户
+    private val TAG_USER_COLLECT = "TAG_USER_COLLECT"//收藏文章
+    private val TAG_USER_TODO = "TAG_USER_TODO"//todoView
+    private val TAG_USER_COIN_DETAILS = "TAG_USER_COIN_DETAILS"//硬币详情
 
     override fun getLayout(): Int {
         return R.layout.fragment_user
@@ -30,24 +30,26 @@ class UserFragment: BaseFragment(),View.OnClickListener{
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
         val list = ArrayMap<String, BaseFragment>()
-        list[KEY_USER] = UserMainFragment(this)
-        list[KEY_COLLECT] = CollectArticlesFragment()
-        list[KEY_TODO] = TODOFragment()
-        list[KEY_COIN_DETAILS] = CoinCountDetailsFragment()
+        list[TAG_USER_MAIN] = UserMainFragment(this)
+        list[TAG_USER_COLLECT] = CollectArticlesFragment()
+        list[TAG_USER_TODO] = TODOFragment()
+        list[TAG_USER_COIN_DETAILS] = CoinCountDetailsFragment()
 
-        fragmentCtrl.onCreate(this,savedInstanceState,list,KEY_USER)
+        fragmentCtrl.onCreate(this,savedInstanceState,list,TAG_USER_MAIN)
     }
 
     override fun onBackPressed(): Boolean {
 
-        showToast(fragmentCtrl.getCurrentFragment()?.tag!!)
-        return if (isHidden||fragmentCtrl.getCurrentFragment()?.tag == KEY_USER){
-            super.onBackPressed()
-        }else{
+        if (isHidden){
+            showToast("隐藏")
+            return super.onBackPressed()
+        }else if (!fragmentCtrl.onBackPressed()){
             //仅当当前显示，且显示的不为用户信息主页面时消化该事件，回到用户主页
-            fragmentCtrl.showFragment(KEY_USER)
-            true
+            log("${tag}正在执行返回事件","fragment")
+            fragmentCtrl.showFragment(TAG_USER_MAIN)
         }
+
+        return true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -64,16 +66,16 @@ class UserFragment: BaseFragment(),View.OnClickListener{
         when(v.id){
             R.id.coinCount ->{
                 showToast("积分信息")
-                fragmentCtrl.showFragment(KEY_COIN_DETAILS)
+                fragmentCtrl.showFragment(TAG_USER_COIN_DETAILS)
             }
             R.id.collectArticlesBtn->{//请求文章
-                fragmentCtrl.showFragment(KEY_COLLECT)
+                fragmentCtrl.showFragment(TAG_USER_COLLECT)
             }
             R.id.logoutBtn->{
                 RequestCtrl.requestLogout {}//请求退出账户
             }
             R.id.todo->{
-                fragmentCtrl.showFragment(KEY_TODO)
+                fragmentCtrl.showFragment(TAG_USER_TODO)
             }
             R.id.nightMode->{
 

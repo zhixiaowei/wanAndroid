@@ -12,6 +12,8 @@ import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
 import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
+import com.huangxiaowei.wanandroid.data.bean.weChatListBean.WeChatListBean
+import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListBean
 
 @Suppress("UNCHECKED_CAST")
 class WanResponseAnalyst(private val json:String){
@@ -52,7 +54,9 @@ class WanResponseAnalyst(private val json:String){
             QueryTodoBean::class.java
                 -> JSON.parseObject(getData(),clazz) as T
             BannerBean::class.java,
-            HotKeyBean::class.java
+            HotKeyBean::class.java,
+            WeChatListBean::class.java,
+            WeChatArticleListBean::class.java
                 -> JSON.parseObject(json,clazz) as T
             else -> null
         }

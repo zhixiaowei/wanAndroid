@@ -18,7 +18,7 @@ class CollectArticleListAdapter(private val context: Context, listBean: CollectA
         val holder:ViewHolder
 
         if (convertView==null){
-            tempView = View.inflate(context, R.layout.article_item, null)
+            tempView = View.inflate(context, R.layout.item_article, null)
             holder = ViewHolder()
             holder.author = tempView.findViewById(R.id.articleAuthor) as TextView
             holder.title = tempView.findViewById(R.id.articleTitle) as TextView

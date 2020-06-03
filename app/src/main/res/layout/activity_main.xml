@@ -38,7 +38,7 @@
             android:layout_weight="1"
             android:onClick="onClick"
             android:background="@null"
-            android:text="广场"/>
+            android:text="发现"/>
 
         <Button
             android:id="@+id/main_weChat"
