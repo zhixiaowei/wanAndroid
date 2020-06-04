@@ -3,20 +3,16 @@ package com.huangxiaowei.wanandroid.adaptor
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
-import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
-import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleBean
 import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WechatArticleItem
 
-class WeChatArticleListAdapter(private val context: Context,val articleList:List<WechatArticleItem>):BaseAdapter(){
+class WeChatArticleListAdapter(private val context: Context,val list:ArrayList<WechatArticleItem>)
+    :CommonAdapter<WechatArticleItem>(context,list){
 
-    private val list = ArrayList(articleList)
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
+    override fun getItemView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val tempView:View
         val holder:ViewHolder
 
@@ -80,10 +76,6 @@ class WeChatArticleListAdapter(private val context: Context,val articleList:List
     fun addList(temp: List<WechatArticleItem>){
         list.addAll(temp)
         notifyDataSetChanged()
-    }
-
-    fun clear(){
-        list.clear()
     }
 
     private class ViewHolder{

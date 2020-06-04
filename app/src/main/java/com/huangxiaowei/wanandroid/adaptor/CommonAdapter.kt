@@ -8,9 +8,17 @@ import androidx.core.view.children
 
 abstract class CommonAdapter<T>(private val ct:Context,private var mlist: ArrayList<T>): BaseAdapter() {
 
-    var clickListener:OnItemClickListener? = null
+    private var clickListener:OnItemClickListener? = null
 
-    var longClickListener:OnItemLongClickListener? = null
+    private var longClickListener:OnItemLongClickListener? = null
+
+    fun setOnClickListener(listener: OnItemClickListener?){
+        this.clickListener = listener
+    }
+
+    fun setOnLongClickListener(listener:OnItemLongClickListener?){
+        this.longClickListener = listener
+    }
 
     fun addList(list:ArrayList<T>){
         mlist.addAll(list)
@@ -20,7 +28,15 @@ abstract class CommonAdapter<T>(private val ct:Context,private var mlist: ArrayL
         mlist.clear()
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+    override fun getItem(position: Int): T {
+        return mlist[position]
+    }
+
+    override fun getCount(): Int {
+        return mlist.size
+    }
+
+    final override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val v = getItemView(position, convertView, parent)
 
         initOnClickListener(v,position)

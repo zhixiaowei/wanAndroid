@@ -12,7 +12,7 @@ class SuperListView(context: Context,attrs: AttributeSet?=null):ListView(context
     private var bottomPosition = 0//可见列表的底部
     private var iOnSlideListener:IOnSlideListener? = null
 
-    fun setOnSlideListener(iOnSlideListener: IOnSlideListener){
+    fun setOnSlideListener(iOnSlideListener:IOnSlideListener){
         this.iOnSlideListener = iOnSlideListener
         setOnScrollListener(listenerSlide)//监听滑动事件
     }

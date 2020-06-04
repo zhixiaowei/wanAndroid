@@ -24,6 +24,8 @@ class SearchFragment: BaseFragment(){
 
     private var articleAdapter: ArticleListAdapter?= null
     private var mPage = 0
+    private var totalPage:Int = 0
+
     private var searchText = ""
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,8 +60,13 @@ class SearchFragment: BaseFragment(){
             override fun onTop() {}
 
             override fun onBottom() {
-                bottom_tip.visibility = View.VISIBLE
-                updateArticleList(++mPage)//加载更多
+                if (mPage >= totalPage) {
+                    showToast("再往下拉也没有了！")
+                }else{
+                    bottom_tip.visibility = View.VISIBLE
+                    updateArticleList(++mPage)//加载更多
+                }
+
             }
 
         })
@@ -110,7 +117,13 @@ class SearchFragment: BaseFragment(){
 
         RequestCtrl.requestSearch(searchText,page){returnPage: Int, bean: ArticleListBean ->
 
-            this.mPage = returnPage
+            this.mPage = bean.curPage
+            this.totalPage = bean.pageCount
+
+            if (bean.over){
+                showToast("再往下拉也没有啦！")
+                return@requestSearch
+            }
 
             if (articleAdapter == null){
                 articleAdapter = ArticleListAdapter(attackActivity,bean)

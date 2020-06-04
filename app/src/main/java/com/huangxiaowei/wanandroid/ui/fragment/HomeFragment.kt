@@ -88,9 +88,13 @@ class  HomeFragment: BaseFragment(){
                    articleAdapter!!.addList(bean)
                }
 
-               bottom_tip.visibility = View.INVISIBLE
                if (page!=0){
-                   articleList.smoothScrollByOffset(1)//向下滑动一格
+                   if (bean.over){
+                       showToast("再往下拉也没有啦！")
+                       return@requestArticleList
+                   }else{
+                       articleList.smoothScrollByOffset(1)//向下滑动一格
+                   }
                }
 
                showToast("加载完毕")
