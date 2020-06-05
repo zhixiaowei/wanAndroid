@@ -53,6 +53,7 @@ class MainActivity : BaseFragmentActivity(),View.OnClickListener,IOnLoginCallbac
     }
 
     override fun onCreated(savedInstanceState: Bundle?) {
+        LoginStateManager.addLoginStateListener(true,this.javaClass.name,this)
         bottomBtn = arrayOf(main_home,main_user,main_weChat,main_square)
         updateBottomBtnStatus(main_home)
     }
