@@ -1,6 +1,5 @@
 package com.huangxiaowei.wanandroid.ui.fragment
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -55,7 +54,6 @@ class  HomeFragment: BaseFragment(){
             )
 
             bannerView.adapter = adapter
-            articleList.addHeaderView(bannerView)
 
             bannerView.setOnBannerListener { data, _ ->
                 WebActivity.startActivity(attackActivity, (data as BannerItem).url)
@@ -68,12 +66,13 @@ class  HomeFragment: BaseFragment(){
      */
     private fun updateArticleList(page:Int = 0) {
 
-           articleRefresh.isRefreshing = false//停止显示刷新控件
-
            RequestCtrl.requestArticleList(page) {
                    returnPage:Int,
                    bean:ArticleListBean->
 
+
+               articleRefresh.isRefreshing = false//停止显示刷新控件
+               bottom_tip.visibility  = View.INVISIBLE
                this.page = returnPage
 
                if (articleAdapter == null){
@@ -111,7 +110,6 @@ class  HomeFragment: BaseFragment(){
         bannerView.stop()
     }
 
-    @SuppressLint("InflateParams")
     private fun initView() {
 
         bannerView = layoutInflater.inflate(R.layout.view_banner,null) as Banner<*, *>
@@ -121,6 +119,8 @@ class  HomeFragment: BaseFragment(){
             layoutParams = AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
                 ,dp2px(200f).toInt())
         }
+
+        articleList.addHeaderView(bannerView)
 
         //文章标题点击后打开文章
         articleList.setOnItemClickListener { _,_, position,_ ->

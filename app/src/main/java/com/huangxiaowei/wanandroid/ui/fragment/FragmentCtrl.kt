@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.ui.BaseFragment
+import com.huangxiaowei.wanandroid.utils.Logger
 import kotlin.Exception
 
 class FragmentCtrl{
@@ -15,6 +16,7 @@ class FragmentCtrl{
         const val KEY_TAG = "KEY_TAG"
     }
 
+    private val LOG_TAG = this.javaClass.name
     private var currentFragment:BaseFragment? = null//当前正在显示Fragment
     private lateinit var fragmentManager: FragmentManager
     private lateinit var list:ArrayMap<String, BaseFragment>
@@ -24,6 +26,7 @@ class FragmentCtrl{
     private val executor = object:
         BaseFragment.OnFragmentRequestCallback {
         override fun onStartFragment(tag: String) {
+            Logger.i("试图启动：$tag", LOG_TAG)
             showFragment(tag)
         }
 
@@ -156,7 +159,7 @@ class FragmentCtrl{
 
     class ConfigBuilder{
 
-        private val config = Config()
+        private val config = FragmentConfig()
 
         fun addList(list:ArrayMap<String, BaseFragment>):ConfigBuilder{
             config.list = list
@@ -168,12 +171,12 @@ class FragmentCtrl{
             return this
         }
 
-        fun build():Config{
-            return Config(config.list,config.mainFragment)
+        fun build():FragmentConfig{
+            return FragmentConfig(config.list,config.mainFragment)
         }
     }
 
-    data class Config(
+    data class FragmentConfig(
        var list:ArrayMap<String, BaseFragment>? = null,
        var mainFragment:String = ""
     )

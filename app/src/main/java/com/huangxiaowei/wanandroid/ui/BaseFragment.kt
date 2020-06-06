@@ -2,19 +2,20 @@ package com.huangxiaowei.wanandroid.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.huangxiaowei.wanandroid.log
+import com.huangxiaowei.wanandroid.utils.Logger
 
 abstract class BaseFragment:Fragment(){
     lateinit var attackActivity: AppCompatActivity
 
     abstract fun getLayout():Int//返回layout的ID
     abstract fun onCreated(view: View, savedInstanceState: Bundle?)
+
+    private val LOG_TAG_FRAGMENT = "Fragment"
 
     private var request:OnFragmentRequestCallback? = null
 
@@ -31,7 +32,7 @@ abstract class BaseFragment:Fragment(){
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        log("${tag}:onViewCreated","fragment")
+        Logger.i("${tag}:onViewCreated",LOG_TAG_FRAGMENT)
         super.onViewCreated(view, savedInstanceState)
         onCreated(view, savedInstanceState)
     }
@@ -70,9 +71,9 @@ abstract class BaseFragment:Fragment(){
         super.onHiddenChanged(hidden)
 
         if (hidden){
-            log("${tag}:onHidden","fragment")
+            Logger.i("${tag}:onHidden",LOG_TAG_FRAGMENT)
         }else{
-            log("${tag}:onShow","fragment")
+            Logger.i("${tag}:onShow",LOG_TAG_FRAGMENT)
         }
     }
 

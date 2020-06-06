@@ -1,7 +1,7 @@
 package com.huangxiaowei.wanandroid.client.cookie
 
 import com.huangxiaowei.wanandroid.App
-import com.huangxiaowei.wanandroid.log
+import com.huangxiaowei.wanandroid.utils.Logger
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
@@ -16,7 +16,7 @@ class SuperCookie: CookieJar{
         val cookies = cookieStore.getCookie(url)
 
         for (c in cookies){
-            log("key:${c.name}:value:${c.value}")
+            Logger.i("key:${c.name}:value:${c.value}")
         }
         return cookies ?: ArrayList()
     }

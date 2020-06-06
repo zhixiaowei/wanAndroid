@@ -14,12 +14,15 @@ import kotlinx.android.synthetic.main.fragment_user_todo.*
 
 class TODOFragment :BaseFragment(),OnItemClickListener {
 
-    private var doList:ArrayList<TodoBean>? = null
-    private var finishList:ArrayList<TodoBean>? = null
+    private var doList:ArrayList<TodoBean>? = null//未完成的TODO列表
+    private var finishList:ArrayList<TodoBean>? = null//已完成的TODO列表
 
-    private val CURRENT_DO_LIST = 0
-    private val CURRENT_FINISH_LIST = 1
-    private var current:Int = CURRENT_DO_LIST
+    companion object{
+        private const val CURRENT_DO_LIST = 0 //未完成的TODO
+        private const val CURRENT_FINISH_LIST = 1 //已完成的TODO
+    }
+
+    private var current:Int = CURRENT_DO_LIST//当前所在的TODO View
 
     override fun onItemClick(v: View, position: Int): Boolean {
 

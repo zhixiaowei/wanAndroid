@@ -8,7 +8,7 @@ import com.huangxiaowei.wanandroid.ui.fragment.FragmentCtrl
 abstract class BaseFragmentActivity: AppCompatActivity(){
 
     private val fragmentCtrl = FragmentCtrl()//fragment的显示及隐藏，重建的管理类
-    private lateinit var config:FragmentCtrl.Config
+    private lateinit var config:FragmentCtrl.FragmentConfig
 
     /**
      * 获取布局文件ID
@@ -18,7 +18,7 @@ abstract class BaseFragmentActivity: AppCompatActivity(){
     /**
      * 获取所有Fragment的实例的ArrayMap，以及设置默认显示的Fragment
      */
-    abstract fun getFragmentConfig():FragmentCtrl.Config
+    abstract fun getFragmentConfig():FragmentCtrl.FragmentConfig
 
     /**
      * 由于Fragment的创建及显示必须要在setContentView()之后，但又不适合在onStart之后重复执行

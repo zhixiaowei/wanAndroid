@@ -1,6 +1,7 @@
 package com.huangxiaowei.wanandroid.globalStatus
 
 import android.util.ArrayMap
+import android.util.Log
 import com.alibaba.fastjson.JSON
 import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.bean.UserBean
@@ -60,6 +61,7 @@ object LoginStateManager{
      * 登录，且通知全局
      */
     fun login(json:String,userBean: UserBean){
+        Log.i("fragment","登录账户")
         isLogin = true
         user = userBean
 
@@ -79,6 +81,7 @@ object LoginStateManager{
      * 退出账户
      */
     fun logout(){
+        Log.i("fragment","退出账户")
         isLogin = false
         user = null
 
@@ -95,6 +98,8 @@ object LoginStateManager{
      * 登签信息失效
      */
     fun loginInvalid(){
+
+        Log.i("fragment","登录失效")
         isLogin = false
         user = null
         cleanLoginLocalTemp()

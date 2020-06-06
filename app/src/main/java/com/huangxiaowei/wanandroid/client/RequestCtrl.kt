@@ -13,12 +13,11 @@ import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
 import com.huangxiaowei.wanandroid.data.bean.weChatListBean.WeChatListBean
 import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListBean
-import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListData
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.globalStatus.ioScope
 import com.huangxiaowei.wanandroid.globalStatus.uiScope
-import com.huangxiaowei.wanandroid.log
 import com.huangxiaowei.wanandroid.showToast
+import com.huangxiaowei.wanandroid.utils.Logger
 import kotlinx.coroutines.launch
 
 object RequestCtrl {
@@ -173,7 +172,7 @@ object RequestCtrl {
 
                 override fun onError(e: Exception, response: String) {
                     uiScope.launch {
-                        showToast(response)
+                        showToast(response)//请先登录
                         callback(null)
                     }
                 }
@@ -258,12 +257,7 @@ object RequestCtrl {
 
                             val bean = response.parseObject(CollectArticleListBean::class.java)!!
                             uiScope.launch { callback(false,page,bean) }//更新UI
-                        }
-                        response.isLoginInvalid() -> {
-                            LoginStateManager.loginInvalid()
-                            uiScope.launch { callback(true,page,CollectArticleListBean()) }
-                        }
-                        else -> {
+                        }else -> {
                             uiScope.launch { showToast(response.getErrorMsg()) }
                             onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为" +
                                     "[${response.getResultCode()}]," + response.getErrorMsg()),response.getErrorMsg())
@@ -319,7 +313,6 @@ object RequestCtrl {
                         uiScope.launch { callback(response.parseObject(CoinCountBean::class.java)) }
                         Preference.putValue(KEY_REQUEST_COIN,response.getData())
                     }
-                    response.isLoginInvalid() -> LoginStateManager.loginInvalid()
                     else -> {
                         //请求失败
                         uiScope.launch {
@@ -402,8 +395,6 @@ object RequestCtrl {
                 uiScope.launch {
                     if (reply.isSuccess()){
                         callback(reply.parseObject(CoinCountDetailsBean::class.java))
-                    }else if (reply.isLoginInvalid()){
-                        LoginStateManager.loginInvalid()
                     }else{
 
                     }
@@ -528,16 +519,14 @@ object RequestCtrl {
                         val reply = WanResponseAnalyst(json)
                         if (reply.isSuccess()){
                             val t = reply.getData()
-                            log(t,"HttpClient")
+                            Logger.i(t,"HttpClient")
 
                             val j = org.json.JSONObject(t)
                             if (j.has("datas")){
-                                log(j.getString("datas"),"array")
+                                Logger.i(j.getString("datas"),"array")
                             }
 
                             callback(reply.parseObject(QueryTodoBean::class.java))
-                        }else if (reply.isLoginInvalid()){
-                            LoginStateManager.loginInvalid()
                         }else{
 
                         }

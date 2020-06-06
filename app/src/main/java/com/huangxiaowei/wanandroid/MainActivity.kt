@@ -26,7 +26,7 @@ class MainActivity : BaseFragmentActivity(),View.OnClickListener,IOnLoginCallbac
 
     override fun getLayoutID() = R.layout.activity_main
 
-    override fun getFragmentConfig(): FragmentCtrl.Config {
+    override fun getFragmentConfig(): FragmentCtrl.FragmentConfig {
         val map = ArrayMap<String,BaseFragment>()
         map[TAG_HOME] = HomeFragment()
         map[TAG_WE_CHAT] = WeChatFragment()
@@ -69,11 +69,11 @@ class MainActivity : BaseFragmentActivity(),View.OnClickListener,IOnLoginCallbac
             R.id.main_weChat->
                 showFragment(TAG_WE_CHAT)
             R.id.main_user->
-                if (LoginStateManager.isLogin){
-                    showFragment(TAG_USER)
-                }else{
-                    showFragment(TAG_LOGIN)
-                }
+//                if (LoginStateManager.isLogin){
+                  showFragment(TAG_USER)
+//                }else{
+//                    showFragment(TAG_LOGIN)
+//                }
         }
     }
 

@@ -1,6 +1,7 @@
 package com.huangxiaowei.wanandroid.ui.fragment.userFragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
@@ -8,6 +9,7 @@ import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.ui.BaseFragment
+import com.huangxiaowei.wanandroid.ui.fragment.UserFragment
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_user_main.*
 
@@ -15,6 +17,13 @@ class UserMainFragment(private val onAgentClickListener: View.OnClickListener):B
 
     override fun onLogin(user: UserBean) {
         userName.text = user.nickname
+
+        //更新积分
+        RequestCtrl.requestCoinCount {
+            it?.apply {
+                this@UserMainFragment.coinCount.text = coinCount.toString()
+            }
+        }
     }
 
     override fun onLogout() {
@@ -23,7 +32,7 @@ class UserMainFragment(private val onAgentClickListener: View.OnClickListener):B
     }
 
     override fun onLoginInvalid() {
-        userName.text = ""
+        onLogout()
     }
 
     override fun getLayout(): Int {
@@ -38,12 +47,5 @@ class UserMainFragment(private val onAgentClickListener: View.OnClickListener):B
         logoutBtn.setOnClickListener(onAgentClickListener)
         coinCount.setOnClickListener(onAgentClickListener)
         todo.setOnClickListener(onAgentClickListener)
-
-
-        RequestCtrl.requestCoinCount {
-            it?.apply {
-                this@UserMainFragment.coinCount.text = coinCount.toString()
-            }
-        }
     }
 }

@@ -16,7 +16,18 @@ class CollectArticlesFragment: BaseFragment() {
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
 
-        RequestCtrl.requestCollectArticles(0){
+        articleList.setOnItemClickListener { parent, view, position, id ->
+            articleAdapter?.apply {
+                val url = getItem(position).link
+                WebActivity.startActivity(attackActivity,url)
+            }
+        }
+
+        updateCollectList()
+    }
+
+    fun updateCollectList(page:Int = 0){
+        RequestCtrl.requestCollectArticles(page){
                 isLoginInvalid:Boolean,
                 returnPage:Int,
                 bean: CollectArticleListBean ->
@@ -35,13 +46,6 @@ class CollectArticlesFragment: BaseFragment() {
                 }
             }else {
                 articleAdapter!!.addList(bean)
-            }
-        }
-
-        articleList.setOnItemClickListener { parent, view, position, id ->
-            articleAdapter?.apply {
-                val url = getItem(position).link
-                WebActivity.startActivity(attackActivity,url)
             }
         }
     }

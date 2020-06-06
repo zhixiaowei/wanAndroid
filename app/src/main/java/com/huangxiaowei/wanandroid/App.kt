@@ -14,6 +14,7 @@ import com.alibaba.fastjson.JSON
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.bean.UserBean
+import com.huangxiaowei.wanandroid.utils.Logger
 import com.simple.spiderman.SpiderMan
 import java.lang.Exception
 
@@ -24,6 +25,7 @@ class App:Application(){
         lateinit var context:Context
 
         val handler = Handler(Looper.getMainLooper())
+        val LOG_TAG = "APP Activity"
     }
 
 
@@ -39,7 +41,7 @@ class App:Application(){
             }
 
             override fun onActivityStarted(activity: Activity) {
-                log("onStart", activity.componentName.className)
+                Logger.i("${activity.componentName.className}:onStart", LOG_TAG)
             }
 
             override fun onActivityDestroyed(activity: Activity) {
@@ -49,7 +51,7 @@ class App:Application(){
             }
 
             override fun onActivityStopped(activity: Activity) {
-                log("onStop", activity.componentName.className)
+                Logger.i("${activity.componentName.className}:onStop", LOG_TAG)
             }
 
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -65,9 +67,5 @@ fun showToast(text: String){
     App.handler.post {
         Toast.makeText(App.context,text,Toast.LENGTH_SHORT).show()
     }
-}
-
-fun log(str:String,tag:String = "TAG"){
-    Log.i(tag,str)
 }
 

@@ -3,6 +3,7 @@ package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import android.util.Log
 import com.huangxiaowei.wanandroid.client.cookie.SuperCookie
+import com.huangxiaowei.wanandroid.utils.Logger
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -41,7 +42,7 @@ class HttpClient {
             override fun onResponse(call: Call, response: Response) {
 
                 val text = response.body?.string()?:""
-                Log.i(mTAG, "获取到POST应答：${text}")
+                Logger.i("获取到POST应答：${text}",mTAG)
                 callback?.onSuccess(text)
             }
 
@@ -89,7 +90,8 @@ class HttpClient {
 
                 val text = response.body?.string()?:""
 
-                Log.i(mTAG, "获取到GET应答：${text}")
+                Logger.i("获取到GET应答：${text}",mTAG)
+//                Log.i(mTAG, "获取到GET应答：${text}")
 
                 callback.onSuccess(text)
             }

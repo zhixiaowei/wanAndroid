@@ -112,13 +112,14 @@ class SearchFragment: BaseFragment(){
     }
 
     private fun updateArticleList(page: Int = 0,searchText:String = this.searchText) {
-        tagLayout.visibility = View.GONE
-        bottom_tip.visibility = View.VISIBLE
 
         RequestCtrl.requestSearch(searchText,page){returnPage: Int, bean: ArticleListBean ->
 
             this.mPage = bean.curPage
             this.totalPage = bean.pageCount
+
+            tagLayout.visibility = View.GONE
+            bottom_tip.visibility = View.VISIBLE
 
             if (bean.over){
                 showToast("再往下拉也没有啦！")
