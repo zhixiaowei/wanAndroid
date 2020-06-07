@@ -3,6 +3,7 @@ package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import android.util.Log
 import com.huangxiaowei.wanandroid.client.cookie.SuperCookie
+import com.huangxiaowei.wanandroid.ui.ConnectUtils
 import com.huangxiaowei.wanandroid.utils.Logger
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -14,8 +15,10 @@ class HttpClient {
     private val mOkHttpClient = OkHttpClient()
         .newBuilder()
         .cookieJar(SuperCookie())
+        .addNetworkInterceptor(CacheInterceptor.NetCacheInterceptor)
+        .addInterceptor(CacheInterceptor.OfflineCacheInterceptor)
+        .cache(CacheInterceptor.getCache())
         .build()
-
 
     private val mTAG = this.javaClass.canonicalName?:"TAG"
 
@@ -88,12 +91,18 @@ class HttpClient {
 
             override fun onResponse(call: Call, response: Response) {
 
-                val text = response.body?.string()?:""
+                if (response.isSuccessful){
+                    val text = response.body?.string()?:""
 
-                Logger.i("获取到GET应答：${text}",mTAG)
-//                Log.i(mTAG, "获取到GET应答：${text}")
+                    Logger.i("获取到GET应答：${text}",mTAG)
+                    callback.onSuccess(text)
+                }else if (response.cacheResponse!=null){
+                    val text = response.cacheResponse!!.body!!.string()
+                    Logger.i("请求网络失败，但是我们获取了缓存：${text}",mTAG)
+                }
 
-                callback.onSuccess(text)
+
+
             }
         })
     }

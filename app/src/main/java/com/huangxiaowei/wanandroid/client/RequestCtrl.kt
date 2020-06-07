@@ -26,7 +26,7 @@ object RequestCtrl {
 
     private const val baseUrl = "https://www.wanandroid.com"
 
-    const val KEY_REQUEST_ARTICLE_LIST = "key_request_article_list"//请求文章
+//    const val KEY_REQUEST_ARTICLE_LIST = "key_request_article_list"//请求文章
     const val KEY_REQUEST_BANNER = "key_request_banner"//请求Banner
     const val KEY_REQUEST_COIN ="key_request_coin"//请求最新积分
 
@@ -39,7 +39,7 @@ object RequestCtrl {
      */
     fun requestArticleList(requestPage:Int = 0,callback:(page:Int,reply:ArticleListBean)->Unit){
 
-        val localKey = KEY_REQUEST_ARTICLE_LIST
+//        val localKey = KEY_REQUEST_ARTICLE_LIST
 
         ioScope.launch {
             httpClient.doGet("${baseUrl}/article/list/${requestPage}/json",object:HttpClient.OnIRequestResult{
@@ -56,7 +56,7 @@ object RequestCtrl {
 
                         if (requestPage == 0){
                             //可以做一下本地缓存
-                            Preference.putValue(localKey,data)
+//                            Preference.putValue(localKey,data)
                         }
                     }else{
                         onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为" +
@@ -69,23 +69,23 @@ object RequestCtrl {
 
                     e.printStackTrace()
 
-                    //请求服务器返回异常，则加载本地数据
-                    val bean = if (hasLocalTemp(localKey)){
-                        try {
-                            JSON.parseObject(getLocalTemp(localKey), ArticleListBean::class.java)
-                        }catch (e:Exception){
-                            e.printStackTrace()
-                            cleanErrorTemp(localKey)
-                            ArticleListBean()
-                        }
-                    }else{
-                        ArticleListBean()
-                    }
-
-                    uiScope.launch {
-                        showToast("访问服务器失败，请检查网络状态是否正常")
-                        callback(0,bean)
-                    }
+//                    //请求服务器返回异常，则加载本地数据
+//                    val bean = if (hasLocalTemp(localKey)){
+//                        try {
+//                            JSON.parseObject(getLocalTemp(localKey), ArticleListBean::class.java)
+//                        }catch (e:Exception){
+//                            e.printStackTrace()
+//                            cleanErrorTemp(localKey)
+//                            ArticleListBean()
+//                        }
+//                    }else{
+//                        ArticleListBean()
+//                    }
+//
+//                    uiScope.launch {
+//                        showToast("访问服务器失败，请检查网络状态是否正常")
+//                        callback(0,bean)
+//                    }
                 }
             })
         }
