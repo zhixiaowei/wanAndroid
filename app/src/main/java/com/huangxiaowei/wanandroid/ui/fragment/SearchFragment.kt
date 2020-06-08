@@ -15,6 +15,10 @@ import com.huangxiaowei.wanandroid.ui.view.SuperListView
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.include_article_list.*
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ListView
+import com.huangxiaowei.wanandroid.adaptor.HistoryAdapter
+import com.huangxiaowei.wanandroid.adaptor.OnItemClickListener
 
 class SearchFragment: BaseFragment(){
 
@@ -22,11 +26,11 @@ class SearchFragment: BaseFragment(){
         return R.layout.fragment_search
     }
 
-    private var articleAdapter: ArticleListAdapter?= null
-    private var mPage = 0
-    private var totalPage:Int = 0
+    private var articleAdapter: ArticleListAdapter?= null//检索结果列表
+    private var historyAdapter:HistoryAdapter? = null//历史记录
 
-    private var searchText = ""
+    private var searchText = ""//检索内容
+    private var mPage = 0//当前页码
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
         search_btn.setOnClickListener {
@@ -60,13 +64,8 @@ class SearchFragment: BaseFragment(){
             override fun onTop() {}
 
             override fun onBottom() {
-                if (mPage >= totalPage) {
-                    showToast("再往下拉也没有了！")
-                }else{
                     bottom_tip.visibility = View.VISIBLE
                     updateArticleList(++mPage)//加载更多
-                }
-
             }
 
         })
@@ -91,6 +90,35 @@ class SearchFragment: BaseFragment(){
                 tagLayout.addView(hotKeyTv)
             }
         }
+
+        val list = listOf("大明","小明","大米")
+        historyAdapter = HistoryAdapter(attackActivity, ArrayList(list))
+        historyAdapter!!.setOnClickListener(object:OnItemClickListener{
+            override fun onItemClick(v: View, position: Int): Boolean {
+
+                when(v.id){
+                    R.id.item_history_msg ->{
+                        val text = historyAdapter!!.getItem(position)
+                        search_tv.setText(text)
+                        updateArticleList(0,text)
+                    }
+                    R.id.item_history_delete ->{
+                        //删除
+                        showToast("删除：$position")
+                    }
+                }
+                return true
+            }
+        })
+
+        historySearchList.adapter = historyAdapter
+
+        historyCleanBtn.setOnClickListener {
+            //删除所有历史记录
+            showToast("清空")
+        }
+
+
     }
 
     /**
@@ -98,11 +126,11 @@ class SearchFragment: BaseFragment(){
      */
     override fun onBackPressed(): Boolean {
 
-        return if (isHidden||tagLayout.visibility == View.VISIBLE){
+        return if (isHidden||historyLayout.visibility == View.VISIBLE){
             super.onBackPressed()
         }else{
             //如果执行返回键且当前正显示检索内容，则清空检索列表，重新显示热门标签
-            tagLayout.visibility = View.VISIBLE
+            historyLayout.visibility = View.VISIBLE
             articleAdapter?.apply {
                 clear()
                 notifyDataSetChanged()
@@ -113,15 +141,16 @@ class SearchFragment: BaseFragment(){
 
     private fun updateArticleList(page: Int = 0,searchText:String = this.searchText) {
 
-        RequestCtrl.requestSearch(searchText,page){returnPage: Int, bean: ArticleListBean ->
+        RequestCtrl.requestSearch(searchText,page){bean: ArticleListBean ->
 
             this.mPage = bean.curPage
-            this.totalPage = bean.pageCount
 
-            tagLayout.visibility = View.GONE
-            bottom_tip.visibility = View.VISIBLE
+            historyLayout.visibility = View.GONE
+            bottom_tip.visibility = View.GONE
 
-            if (bean.over){
+            if (bean.curPage == 1||bean.curPage == 0){
+
+            }else if (bean.over){
                 showToast("再往下拉也没有啦！")
                 return@requestSearch
             }
@@ -137,8 +166,6 @@ class SearchFragment: BaseFragment(){
             }else {
                 articleAdapter!!.addList(bean)
             }
-
-            bottom_tip.visibility = View.INVISIBLE
         }
     }
 

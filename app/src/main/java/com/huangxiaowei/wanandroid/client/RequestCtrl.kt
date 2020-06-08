@@ -1,7 +1,6 @@
 package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
-import com.huangxiaowei.wanandroid.data.Preference
 import com.huangxiaowei.wanandroid.data.WanResponseAnalyst
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
@@ -17,7 +16,6 @@ import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.globalStatus.ioScope
 import com.huangxiaowei.wanandroid.globalStatus.uiScope
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.utils.Logger
 import kotlinx.coroutines.launch
 
 object RequestCtrl {
@@ -25,10 +23,6 @@ object RequestCtrl {
     private val httpClient = HttpClient()
 
     private const val baseUrl = "https://www.wanandroid.com"
-
-//    const val KEY_REQUEST_ARTICLE_LIST = "key_request_article_list"//请求文章
-    const val KEY_REQUEST_BANNER = "key_request_banner"//请求Banner
-    const val KEY_REQUEST_COIN ="key_request_coin"//请求最新积分
 
     /**
      * 请求文章列表
@@ -39,8 +33,6 @@ object RequestCtrl {
      */
     fun requestArticleList(requestPage:Int = 0,callback:(page:Int,reply:ArticleListBean)->Unit){
 
-//        val localKey = KEY_REQUEST_ARTICLE_LIST
-
         ioScope.launch {
             httpClient.doGet("${baseUrl}/article/list/${requestPage}/json",object:HttpClient.OnIRequestResult{
 
@@ -48,16 +40,9 @@ object RequestCtrl {
                     val response = WanResponseAnalyst(json)
 
                     if (response.isSuccess()){
-
-                        val data = response.getData()
-                        val bean = response.parseObject(ArticleListBean::class.java)!!
+                        val bean = response.parseObject(ArticleListBean::class.java)
 
                         uiScope.launch { callback(requestPage,bean) }//更新UI
-
-                        if (requestPage == 0){
-                            //可以做一下本地缓存
-//                            Preference.putValue(localKey,data)
-                        }
                     }else{
                         onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为" +
                                 "[${response.getResultCode()}]," + response.getErrorMsg()),"")
@@ -66,26 +51,7 @@ object RequestCtrl {
                 }
 
                 override fun onError(e: Exception, response: String) {
-
                     e.printStackTrace()
-
-//                    //请求服务器返回异常，则加载本地数据
-//                    val bean = if (hasLocalTemp(localKey)){
-//                        try {
-//                            JSON.parseObject(getLocalTemp(localKey), ArticleListBean::class.java)
-//                        }catch (e:Exception){
-//                            e.printStackTrace()
-//                            cleanErrorTemp(localKey)
-//                            ArticleListBean()
-//                        }
-//                    }else{
-//                        ArticleListBean()
-//                    }
-//
-//                    uiScope.launch {
-//                        showToast("访问服务器失败，请检查网络状态是否正常")
-//                        callback(0,bean)
-//                    }
                 }
             })
         }
@@ -97,8 +63,6 @@ object RequestCtrl {
      */
     fun requestBanner(callback: (reply: BannerBean) -> Unit){
 
-        val localKey = KEY_REQUEST_BANNER
-
         ioScope.launch {
             httpClient.doGet("$baseUrl/banner/json",object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
@@ -109,8 +73,6 @@ object RequestCtrl {
                         val bean = JSON.parseObject(json, BannerBean::class.java)
 
                         uiScope.launch { callback(bean) }//更新UI
-
-                        Preference.putValue(localKey, json) //可以做一下本地缓存
                     } else {
                         val resultMsg = response.getErrorMsg()
                         onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[${response.getResultCode()}],$resultMsg"),"")
@@ -119,22 +81,6 @@ object RequestCtrl {
 
                 override fun onError(e: Exception, response: String) {
 
-                    //请求服务器返回异常，则加载本地数据
-                    val bean = if (hasLocalTemp(localKey)){
-                        try {
-                            JSON.parseObject(getLocalTemp(localKey), BannerBean::class.java)
-                        }catch (e:Exception){
-                            e.printStackTrace()
-                            BannerBean()
-                        }
-                    }else{
-                        BannerBean()
-                    }
-
-                    uiScope.launch {
-                        showToast("访问服务器失败，请检查网络状态是否正常")
-                        callback(bean)
-                    }
                 }
 
             })
@@ -158,7 +104,7 @@ object RequestCtrl {
 
                     if (response.isSuccess()) {
                         val data = response.getData()
-                        val bean = response.parseObject(UserBean::class.java)!!
+                        val bean = response.parseObject(UserBean::class.java)
                         uiScope.launch { callback(bean) }//更新UI
 
                         bean.password = password
@@ -255,7 +201,7 @@ object RequestCtrl {
                     when {
                         response.isSuccess() -> {
 
-                            val bean = response.parseObject(CollectArticleListBean::class.java)!!
+                            val bean = response.parseObject(CollectArticleListBean::class.java)
                             uiScope.launch { callback(false,page,bean) }//更新UI
                         }else -> {
                             uiScope.launch { showToast(response.getErrorMsg()) }
@@ -288,15 +234,6 @@ object RequestCtrl {
     fun requestCoinCount(callback: (bean: CoinCountBean?) -> Unit){
         val url = "$baseUrl/lg/coin/userinfo/json"
 
-        KEY_REQUEST_COIN.let {
-            if (Preference.contains(it)){
-                val json = Preference.getValue(it,"")
-                if (json.isNotBlank()){
-                    callback(JSON.parseObject(json,CoinCountBean::class.java))
-                }
-            }
-        }
-
         httpClient.doGet(url,object:HttpClient.OnIRequestResult{
             override fun onError(e: Exception, response: String) {
                 //请求失败，检查网络
@@ -311,7 +248,6 @@ object RequestCtrl {
                 when {
                     response.isSuccess() -> {
                         uiScope.launch { callback(response.parseObject(CoinCountBean::class.java)) }
-                        Preference.putValue(KEY_REQUEST_COIN,response.getData())
                     }
                     else -> {
                         //请求失败
@@ -325,7 +261,7 @@ object RequestCtrl {
         })
     }
 
-    fun requestSearch(msg:String,page:Int = 0,callback: (page: Int, reply: ArticleListBean) -> Unit){
+    fun requestSearch(msg:String,page:Int = 0,callback: (reply: ArticleListBean) -> Unit){
 
         val url = "$baseUrl/article/query/$page/json"
 
@@ -341,7 +277,7 @@ object RequestCtrl {
 
                 uiScope.launch {
                     if (reply.isSuccess()){
-                        callback(0,reply.parseObject(ArticleListBean::class.java)!!)
+                        callback(reply.parseObject(ArticleListBean::class.java))
                     }else{
 
                     }
@@ -368,7 +304,7 @@ object RequestCtrl {
                 uiScope.launch {
                     if (reply.isSuccess()){
                         val bean = reply.parseObject(HotKeyBean::class.java)
-                        callback(bean!!)
+                        callback(bean)
                     }else{
 
                     }
@@ -420,7 +356,7 @@ object RequestCtrl {
                     uiScope.launch {
                         val reply = WanResponseAnalyst(json)
                         if (reply.isSuccess()){
-                            callback(reply.parseObject(WeChatListBean::class.java)!!)
+                            callback(reply.parseObject(WeChatListBean::class.java))
                         }
                     }
 
@@ -446,7 +382,7 @@ object RequestCtrl {
                     uiScope.launch {
                         if (reply.isSuccess()){
                             val bean = reply.parseObject(WeChatArticleListBean::class.java)
-                            callback(bean!!)
+                            callback(bean)
                         }
                     }
 
@@ -482,7 +418,6 @@ object RequestCtrl {
                 }
 
                 override fun onSuccess(json: String) {
-
                     uiScope.launch {
                         val reply = WanResponseAnalyst(json)
                         callback(reply.isSuccess())
@@ -504,9 +439,10 @@ object RequestCtrl {
                   ,status:Int = -1,type:Int? = null,priority:Int? = null
                   ,callback: (bean: QueryTodoBean?) -> Unit){
 
-            val url = "$baseUrl/lg/todo/v2/list/$page/json?status=$status&orderby=$orderBy" +
-                    if (type!=null){"type=$type"}else{""}+
-                    if (priority!=null){"priority=$priority"}else{""}
+            val url = "$baseUrl/lg/todo/v2/list/$page/json" +
+                    "?status=$status&orderby=$orderBy" +
+                    if (type!=null){"&type=$type"}else{""}+
+                    if (priority!=null){"&priority=$priority"}else{""}
 
             httpClient.doGet(url,object:HttpClient.OnIRequestResult{
                 override fun onError(e: Exception, response: String) {
@@ -518,14 +454,6 @@ object RequestCtrl {
                     uiScope.launch {
                         val reply = WanResponseAnalyst(json)
                         if (reply.isSuccess()){
-                            val t = reply.getData()
-                            Logger.i(t,"HttpClient")
-
-                            val j = org.json.JSONObject(t)
-                            if (j.has("datas")){
-                                Logger.i(j.getString("datas"),"array")
-                            }
-
                             callback(reply.parseObject(QueryTodoBean::class.java))
                         }else{
 
@@ -589,22 +517,5 @@ object RequestCtrl {
 
             })
         }
-    }
-
-
-
-    private fun cleanErrorTemp(key: String) {
-        Preference.clearPreference(key)
-    }
-
-    /**
-     * 是否有本地缓存
-     */
-    private fun hasLocalTemp(key: String): Boolean {
-        return Preference.contains(key)
-    }
-
-    private fun getLocalTemp(key: String):String{
-        return Preference.getValue(key,"")
     }
 }

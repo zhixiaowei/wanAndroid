@@ -15,6 +15,7 @@ import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
 import com.huangxiaowei.wanandroid.data.bean.weChatListBean.WeChatListBean
 import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListBean
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
+import java.lang.Exception
 
 @Suppress("UNCHECKED_CAST")
 class WanResponseAnalyst(private val json:String){
@@ -51,7 +52,7 @@ class WanResponseAnalyst(private val json:String){
        return getResultCode() == REQUEST_CODE_LOGIN_INVALID||getResultCode() == REQUEST_CODE_UN_LOGIN
     }
 
-    fun <T> parseObject(clazz:Class<T>):T?{
+    fun <T> parseObject(clazz:Class<T>):T{
         return when (clazz) {
             CoinCountBean::class.java,
             CoinCountDetailsBean::class.java,
@@ -65,7 +66,7 @@ class WanResponseAnalyst(private val json:String){
             WeChatListBean::class.java,
             WeChatArticleListBean::class.java
                 -> JSON.parseObject(json,clazz) as T
-            else -> null
+            else -> throw Exception("JSON转换类型失败！")
         }
     }
 

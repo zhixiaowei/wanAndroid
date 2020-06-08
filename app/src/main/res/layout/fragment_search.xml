@@ -40,12 +40,55 @@
         <include layout="@layout/include_article_list"
             />
 
-        <com.google.android.flexbox.FlexboxLayout
-            android:id="@+id/tagLayout"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:justifyContent="space_evenly"
-            app:flexWrap="wrap"
-            />
+            android:orientation="vertical"
+            android:id="@+id/historyLayout"
+            >
+            <com.google.android.flexbox.FlexboxLayout
+                android:id="@+id/tagLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:justifyContent="space_evenly"
+                app:flexWrap="wrap"
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="搜索历史"
+                    android:textSize="20dp"
+                    android:layout_alignParentLeft="true"
+                    android:padding="15dp"
+                    android:textColor="#3592c4"
+                    />
+
+                <TextView
+                    android:id="@+id/historyCleanBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="清空"
+                    android:textSize="20dp"
+                    android:layout_alignParentRight="true"
+                    android:padding="15dp"
+                    />
+            </RelativeLayout>
+
+            <ListView
+                android:id="@+id/historySearchList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@null"
+                android:listSelector="#10000000"
+                tools:listitem="@layout/item_search_history"
+                />
+        </LinearLayout>
+
     </FrameLayout>
 </LinearLayout>

@@ -3,7 +3,6 @@ package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import android.util.Log
 import com.huangxiaowei.wanandroid.client.cookie.SuperCookie
-import com.huangxiaowei.wanandroid.ui.ConnectUtils
 import com.huangxiaowei.wanandroid.utils.Logger
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -17,7 +16,7 @@ class HttpClient {
         .cookieJar(SuperCookie())
         .addNetworkInterceptor(CacheInterceptor.NetCacheInterceptor)
         .addInterceptor(CacheInterceptor.OfflineCacheInterceptor)
-        .cache(CacheInterceptor.getCache())
+        .cache(CacheInterceptor.buildCache())
         .build()
 
     private val mTAG = this.javaClass.canonicalName?:"TAG"
@@ -26,8 +25,8 @@ class HttpClient {
         toPost(uri, param,callback)
     }
 
-    fun doPost(uri: String,param: String,callback:OnIRequestResult){
-        toPost(uri, param,callback)
+    fun doPost(uri: String,json: String,callback:OnIRequestResult){
+        toPost(uri, json,callback)
     }
 
     private fun toPost(uri: String,data: Any,callback:OnIRequestResult?){
