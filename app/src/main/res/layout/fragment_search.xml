@@ -86,6 +86,7 @@
                 android:layout_height="wrap_content"
                 android:divider="@null"
                 android:listSelector="#10000000"
+                android:drawSelectorOnTop="true"
                 tools:listitem="@layout/item_search_history"
                 />
         </LinearLayout>

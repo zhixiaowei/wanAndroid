@@ -93,15 +93,11 @@ class SearchFragment: BaseFragment(){
 
         val list = listOf("大明","小明","大米")
         historyAdapter = HistoryAdapter(attackActivity, ArrayList(list))
+
+        //监听内部控件的点击事件
         historyAdapter!!.setOnClickListener(object:OnItemClickListener{
             override fun onItemClick(v: View, position: Int): Boolean {
-
                 when(v.id){
-                    R.id.item_history_msg ->{
-                        val text = historyAdapter!!.getItem(position)
-                        search_tv.setText(text)
-                        updateArticleList(0,text)
-                    }
                     R.id.item_history_delete ->{
                         //删除
                         showToast("删除：$position")
@@ -112,6 +108,13 @@ class SearchFragment: BaseFragment(){
         })
 
         historySearchList.adapter = historyAdapter
+        historySearchList.setOnItemClickListener { parent, view, position, id ->
+            val text = historyAdapter!!.getItem(position)
+            search_tv.setText(text)
+            search_tv.setSelection(text.length)
+            showToast("检索：$text")
+            search_btn.performClick()
+        }
 
         historyCleanBtn.setOnClickListener {
             //删除所有历史记录

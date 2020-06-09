@@ -4,13 +4,15 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ListView
 import androidx.core.view.children
+import kotlinx.coroutines.selects.select
 
 abstract class CommonAdapter<T>(private val ct:Context,private var mlist: ArrayList<T>): BaseAdapter() {
 
-    private var clickListener:OnItemClickListener? = null
+    var clickListener:OnItemClickListener? = null
 
-    private var longClickListener:OnItemLongClickListener? = null
+    var longClickListener:OnItemLongClickListener? = null
 
     fun setOnClickListener(listener: OnItemClickListener?){
         this.clickListener = listener
@@ -39,24 +41,38 @@ abstract class CommonAdapter<T>(private val ct:Context,private var mlist: ArrayL
     final override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val v = getItemView(position, convertView, parent)
 
-        initOnClickListener(v,position)
+//        initOnClickListener(parent as ListView,v,position)
 
         return v
     }
 
-    private fun initOnClickListener(v: View, position: Int) {
-        if (v is ViewGroup){
-            for (child in v.children){
-                if (child is ViewGroup){
-                    initOnClickListener(child,position)
-                }else{
-                    child.setOnClickListener { clickListener?.onItemClick(child,position) }
-                }
-            }
-        }else{
-            v.setOnClickListener{clickListener?.onItemClick(v,position)}
-        }
-    }
+//    private fun initOnClickListener(convertView: ListView?,parent: View, position: Int) {
+//
+//        if (parent is ViewGroup){
+//            for (child in parent.children){
+//                if (child is ViewGroup){
+//                    initOnClickListener(convertView,child,position)
+//                }else{
+//                    child.setOnClickListener {
+//                        clickListener?.onItemClick(child,position)
+//
+//                        selectItem(convertView,position)
+//                    }
+//                }
+//            }
+//        }else{
+//            parent.setOnClickListener{
+//                clickListener?.onItemClick(parent,position)
+//
+//                selectItem(convertView,position)
+//            }
+//        }
+//    }
+//
+//    private fun selectItem(list: ListView?, position: Int) {
+//        list?.requestFocusFromTouch()
+//        list?.setSelection(list.headerViewsCount+position)
+//    }
 
     abstract fun getItemView(position: Int, convertView: View?, parent: ViewGroup?): View
 
