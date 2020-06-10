@@ -8,15 +8,12 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
-import com.alibaba.fastjson.JSON
-import com.huangxiaowei.wanandroid.client.RequestCtrl
-import com.huangxiaowei.wanandroid.data.Preference
-import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.utils.Logger
 import com.simple.spiderman.SpiderMan
-import java.lang.Exception
+import org.litepal.LitePal
+import org.litepal.tablemanager.Connector
+
 
 class App:Application(){
 
@@ -34,7 +31,10 @@ class App:Application(){
         context = this
 
         SpiderMan.init(this)
-
+        LitePal.initialize(context)
+//        MultiDex.install(this)
+        val db = Connector.getDatabase()
+        Logger.i("db path:${db.path}")
         this.registerActivityLifecycleCallbacks(object: ActivityLifecycleCallbacks{
             override fun onActivityPaused(activity: Activity) {
 

@@ -1,6 +1,8 @@
 package com.huangxiaowei.wanandroid.ui.fragment
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
@@ -15,10 +17,10 @@ import com.huangxiaowei.wanandroid.ui.view.SuperListView
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.include_article_list.*
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ListView
 import com.huangxiaowei.wanandroid.adaptor.HistoryAdapter
 import com.huangxiaowei.wanandroid.adaptor.OnItemClickListener
+import com.huangxiaowei.wanandroid.utils.SoftKeyboardUtils
+import com.huangxiaowei.wanandroid.utils.ViewUtils
 
 class SearchFragment: BaseFragment(){
 
@@ -40,10 +42,15 @@ class SearchFragment: BaseFragment(){
                 showToast("检索内容不能为空")
                 return@setOnClickListener
             }
-
-            search_tv.setText(text)
+            search_tv.setSelection(text.length)
+            showToast("检索：$text")
+            articleRefresh.isRefreshing = true
             updateArticleList(0,text)
         }
+
+        articleLayout.visibility = View.INVISIBLE
+        val v:View = layoutInflater.inflate(R.layout.list_empty,null)
+        ViewUtils.setEmptyView(articleList,v)
 
         //文章列表滑动监听
         articleList.setOnSlideListener(object: SuperListView.IOnSlideListener{
@@ -111,8 +118,6 @@ class SearchFragment: BaseFragment(){
         historySearchList.setOnItemClickListener { parent, view, position, id ->
             val text = historyAdapter!!.getItem(position)
             search_tv.setText(text)
-            search_tv.setSelection(text.length)
-            showToast("检索：$text")
             search_btn.performClick()
         }
 
@@ -121,7 +126,22 @@ class SearchFragment: BaseFragment(){
             showToast("清空")
         }
 
+        search_tv.setOnEditorActionListener { v, actionId, event ->
+            search_btn.performClick()
+        }
 
+        search_tv.addTextChangedListener(object:TextWatcher{
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.toString() != searchText&&!search_btn.isShown){
+                    search_btn.visibility = View.VISIBLE
+                }
+            }
+
+        })
     }
 
     /**
@@ -138,18 +158,34 @@ class SearchFragment: BaseFragment(){
                 clear()
                 notifyDataSetChanged()
             }
+            search_tv.apply {
+                setSelection(text.length)
+            }
+            search_btn.visibility = View.VISIBLE
+            articleLayout.visibility = View.INVISIBLE
             true
         }
     }
 
     private fun updateArticleList(page: Int = 0,searchText:String = this.searchText) {
 
+        search_btn.visibility = View.INVISIBLE
+        historyLayout.visibility = View.GONE
+        articleLayout.visibility = View.VISIBLE
+
+        if (searchText == this.searchText&&page == mPage){
+           return
+        }
+
+        this.searchText = searchText
+
         RequestCtrl.requestSearch(searchText,page){bean: ArticleListBean ->
 
             this.mPage = bean.curPage
-
-            historyLayout.visibility = View.GONE
             bottom_tip.visibility = View.GONE
+            SoftKeyboardUtils.hideSoftKeyboard(attackActivity)
+
+            articleRefresh.isRefreshing = false
 
             if (bean.curPage == 1||bean.curPage == 0){
 
@@ -171,6 +207,7 @@ class SearchFragment: BaseFragment(){
             }
         }
     }
+
 
 
 
