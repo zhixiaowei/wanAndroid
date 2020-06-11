@@ -19,8 +19,11 @@ import kotlinx.android.synthetic.main.include_article_list.*
 import android.view.ViewGroup
 import com.huangxiaowei.wanandroid.adaptor.HistoryAdapter
 import com.huangxiaowei.wanandroid.adaptor.OnItemClickListener
+import com.huangxiaowei.wanandroid.data.litepal.SearchHistoryBean
 import com.huangxiaowei.wanandroid.utils.SoftKeyboardUtils
 import com.huangxiaowei.wanandroid.utils.ViewUtils
+import org.litepal.LitePal
+import org.litepal.crud.LitePalSupport
 
 class SearchFragment: BaseFragment(){
 
@@ -86,7 +89,8 @@ class SearchFragment: BaseFragment(){
                 hotKeyTv.text = item.name
 
                 hotKeyTv.setOnClickListener {
-                    updateArticleList(0,item.name)
+                    search_tv.setText(item.name)
+                    search_btn.performClick()
                 }
 
                 if (hotKeyTv.parent != null){
@@ -98,16 +102,18 @@ class SearchFragment: BaseFragment(){
             }
         }
 
-        val list = listOf("大明","小明","大米")
-        historyAdapter = HistoryAdapter(attackActivity, ArrayList(list))
+        val list = LitePal.findAll(SearchHistoryBean::class.java).sortedByDescending { it.time }
+
+        historyAdapter = HistoryAdapter(attackActivity,ArrayList(list))
 
         //监听内部控件的点击事件
         historyAdapter!!.setOnClickListener(object:OnItemClickListener{
             override fun onItemClick(v: View, position: Int): Boolean {
                 when(v.id){
                     R.id.item_history_delete ->{
-                        //删除
-                        showToast("删除：$position")
+                        historyAdapter?.apply {
+                            delete(getItem(position))
+                        }
                     }
                 }
                 return true
@@ -116,7 +122,7 @@ class SearchFragment: BaseFragment(){
 
         historySearchList.adapter = historyAdapter
         historySearchList.setOnItemClickListener { parent, view, position, id ->
-            val text = historyAdapter!!.getItem(position)
+            val text = historyAdapter!!.getItem(position).msg
             search_tv.setText(text)
             search_btn.performClick()
         }
@@ -178,6 +184,12 @@ class SearchFragment: BaseFragment(){
         }
 
         this.searchText = searchText
+
+        if (page == 0){
+            val history = SearchHistoryBean(System.currentTimeMillis(),searchText)
+            historyAdapter!!.add(history)
+        }
+
 
         RequestCtrl.requestSearch(searchText,page){bean: ArticleListBean ->
 
