@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="15dp"
+    android:padding="@dimen/qb_px_15"
     >
 
     <androidx.appcompat.widget.Toolbar
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="标题:"
-            android:textSize="20dp"
+            android:textSize="@dimen/qb_px_20"
             />
 
         <EditText
@@ -37,7 +37,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:hint="必填"
-            android:textSize="20dp"
+            android:textSize="@dimen/qb_px_20"
             />
 
     </LinearLayout>
@@ -50,8 +50,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="详情："
-            android:textSize="20dp"
+            android:text="详情:"
+            android:textSize="@dimen/qb_px_20"
             />
         <EditText
             android:id="@+id/todo_context"
@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:maxLines="3"
             android:hint="必填"
-            android:textSize="20dp"
+            android:textSize="@dimen/qb_px_20"
             />
     </LinearLayout>
 
@@ -74,7 +74,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="日期："
-            android:textSize="20dp"
+            android:textSize="@dimen/qb_px_20"
             />
         <TextView
             android:id="@+id/todo_date"
@@ -82,7 +82,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textSize="20dp"
+            android:textSize="@dimen/qb_px_20"
             />
     </LinearLayout>
 
@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:background="@color/design_default_color_background"
-        android:textSize="20dp"
+        android:textSize="@dimen/qb_px_20"
         android:text="保存"
         />
 

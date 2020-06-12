@@ -25,7 +25,7 @@
             android:scaleType="fitXY"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_margin="15dp"
+            android:layout_margin="@dimen/qb_px_15"
             android:src="@drawable/add"
             app:borderWidth="12dp" />
 

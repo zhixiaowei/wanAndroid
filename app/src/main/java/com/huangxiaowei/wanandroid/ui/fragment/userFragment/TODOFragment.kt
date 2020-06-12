@@ -139,7 +139,8 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
 
                         if (it) {
                             showToast("添加成功！")
-                            adapter?.addList(listOf(todo))
+                            doList!!.add(todo)
+                            adapter!!.addList(listOf(todo))
                             dialog.dismiss()
                         } else {
                             showToast("添加失败！")

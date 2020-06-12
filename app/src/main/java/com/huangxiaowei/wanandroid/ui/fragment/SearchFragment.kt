@@ -132,6 +132,7 @@ class SearchFragment: BaseFragment(){
             showToast("清空")
         }
 
+        //键盘的Enter键触发
         search_tv.setOnEditorActionListener { v, actionId, event ->
             search_btn.performClick()
         }

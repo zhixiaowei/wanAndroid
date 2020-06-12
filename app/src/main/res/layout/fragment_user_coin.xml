@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:text="硬币"
         android:gravity="center"
-        android:textSize="20dp"/>
+        android:textSize="@dimen/qb_px_20"/>
 
     <com.huangxiaowei.wanandroid.ui.view.SuperListView
         android:id="@+id/coinList"

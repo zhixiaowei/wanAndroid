@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="15dp"
+        android:padding="@dimen/qb_px_15"
         >
 
         <EditText
@@ -24,8 +24,8 @@
 
         <Button
             android:id="@+id/search_btn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/qb_px_30"
+            android:layout_height="@dimen/qb_px_30"
             android:layout_gravity="center"
             android:background="@android:drawable/ic_search_category_default"
             />
@@ -64,9 +64,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="搜索历史"
-                    android:textSize="20dp"
+                    android:textSize="@dimen/qb_px_20"
                     android:layout_alignParentLeft="true"
-                    android:padding="15dp"
+                    android:padding="@dimen/qb_px_15"
                     android:textColor="#3592c4"
                     />
 
@@ -75,7 +75,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="清空"
-                    android:textSize="20dp"
+                    android:textSize="@dimen/qb_px_20"
                     android:layout_alignParentRight="true"
                     android:padding="15dp"
                     />

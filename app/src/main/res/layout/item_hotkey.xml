@@ -9,12 +9,10 @@
         android:id="@+id/hotkeyTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp"
         android:textColor="#F33232"
-        android:layout_margin="10dp"
-        android:textSize="20dp"
+        android:layout_margin="6dp"
+        android:textSize="@dimen/qb_px_16"
         tools:text="Hello world"
-        android:background="@drawable/rect"
         android:drawableRight="@drawable/tag"
         />
 

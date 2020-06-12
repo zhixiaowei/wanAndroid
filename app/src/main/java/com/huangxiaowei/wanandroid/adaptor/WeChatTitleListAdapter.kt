@@ -1,5 +1,6 @@
 package com.huangxiaowei.wanandroid.adaptor
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ class WeChatTitleListAdapter(private val weChatList: List<WeChatItem>) :
     RecyclerView.Adapter<WeChatTitleListAdapter.ViewHolder>() {
 
     private var clickListener:OnItemClickListener? = null
+    private var checkPosition = 0
 
     fun setOnClickListener(listener: OnItemClickListener?){
         this.clickListener = listener
@@ -32,6 +34,11 @@ class WeChatTitleListAdapter(private val weChatList: List<WeChatItem>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = weChatList[position]
         holder.name.text = item.name
+        if (position == checkPosition){
+            holder.name.setTextColor(Color.BLACK)
+        }else{
+            holder.name.setTextColor(Color.GRAY)
+        }
         holder.name.setOnClickListener {
             clickListener?.onItemClick(holder.name,position)
         }
@@ -45,4 +52,13 @@ class WeChatTitleListAdapter(private val weChatList: List<WeChatItem>) :
         return weChatList[position]
     }
 
+    /**
+     * 选中
+     */
+    fun check(position: Int){
+        if (position != checkPosition){
+            checkPosition = position
+            notifyDataSetChanged()
+        }
+    }
 }

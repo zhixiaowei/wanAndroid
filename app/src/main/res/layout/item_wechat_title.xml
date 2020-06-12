@@ -9,10 +9,10 @@
         android:id="@+id/weChatTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
-        android:padding="10dp"
-        android:paddingStart="50dp"
-        android:paddingEnd="25dp"
+        android:textSize="@dimen/qb_px_20"
+        android:padding="@dimen/qb_px_10"
+        android:paddingStart="@dimen/qb_px_50"
+        android:paddingEnd="@dimen/qb_px_25"
         tools:text="大婶"
         >
 

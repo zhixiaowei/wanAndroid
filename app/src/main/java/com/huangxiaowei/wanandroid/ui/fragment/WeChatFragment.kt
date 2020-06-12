@@ -35,6 +35,7 @@ class WeChatFragment : BaseFragment(){
                 setOnClickListener(object:OnItemClickListener{
                     override fun onItemClick(v: View, position: Int): Boolean {
                         requestArticleList(getItem(position).id)
+                        check(position)
                         return true
                     }
                 })

@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:scaleType = "fitXY"
         android:layout_gravity="end|bottom"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/qb_px_15"
         android:visibility="invisible"
         android:src="@drawable/back_top"
         />
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
         android:visibility="invisible"
-        android:padding="10dp"
+        android:padding="@dimen/qb_px_10"
         android:layout_gravity="center|bottom"
         />
 

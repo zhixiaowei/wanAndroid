@@ -117,7 +117,7 @@ class  HomeFragment: BaseFragment(){
         bannerView.run {
             indicator = CircleIndicator(attackActivity)//Banner下方显示N个小圆点
             layoutParams = AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
-                ,dp2px(200f).toInt())
+                ,dp2px(150f).toInt())
         }
 
         articleList.addHeaderView(bannerView)

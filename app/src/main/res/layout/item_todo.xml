@@ -15,23 +15,23 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="@dimen/qb_px_70"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="@dimen/qb_px_10">
 
             <TextView
                 android:id="@+id/todo_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20dp"
+                android:textSize="@dimen/qb_px_20"
                 tools:text="标题"/>
 
             <TextView
                 android:id="@+id/todo_context"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="10dp"
-                android:textSize="15dp"
+                android:paddingStart="@dimen/qb_px_10"
+                android:textSize="@dimen/qb_px_15"
                 tools:text="内容"
                 />
 
@@ -46,16 +46,16 @@
             <Button
                 android:id="@+id/todoFinishBtn"
                 android:background="#008577"
-                android:layout_width="80dp"
-                android:layout_height="70dp"
+                android:layout_width="@dimen/qb_px_80"
+                android:layout_height="@dimen/qb_px_70"
                 android:gravity="center"
                 android:text="已完成"/>
 
             <Button
                 android:id="@+id/todoDeleteBtn"
                 android:background="@android:color/holo_red_light"
-                android:layout_width="80dp"
-                android:layout_height="70dp"
+                android:layout_width="@dimen/qb_px_80"
+                android:layout_height="@dimen/qb_px_70"
                 android:gravity="center"
                 android:text="删除"/>
 

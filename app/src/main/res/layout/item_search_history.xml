@@ -3,9 +3,9 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
+    android:padding="@dimen/qb_px_10"
     android:id="@+id/item_history_layout"
-    android:paddingStart="20dp"
+    android:paddingStart="@dimen/qb_px_20"
     android:focusable="false"
     >
 
@@ -13,7 +13,7 @@
         android:id="@+id/item_history_msg"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="18dp"
+        android:textSize="@dimen/qb_px_18"
         android:focusable="false"
         android:layout_weight="1"/>
 
@@ -21,7 +21,7 @@
         android:id="@+id/item_history_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10dp"
+        android:textSize="@dimen/qb_px_10"
         android:focusable="false"
         android:background="@android:drawable/ic_delete"
         >
