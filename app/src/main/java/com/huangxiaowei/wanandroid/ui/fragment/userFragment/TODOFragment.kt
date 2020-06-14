@@ -131,7 +131,7 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
 
             val d = AddTodoDialog(object :
                 AddTodoDialog.IDialogClickCallback {
-                override fun onComfig(
+                override fun onConfirm(
                     dialog: AddTodoDialog,
                     todo: TodoBean
                 ) {
@@ -150,7 +150,7 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
                     dialog.dismiss()
                 }
 
-                override fun onCancle() {
+                override fun onCancel() {
 
                 }
             })

@@ -15,7 +15,7 @@ object CacheInterceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
             val request = chain.request()
             val response = chain.proceed(request)
-            val onlineCacheTime = 30//在线的时候的缓存过期时间，如果想要不缓存，直接时间设置为0
+            val onlineCacheTime = 5//在线的时候的缓存过期时间，如果想要不缓存，直接时间设置为0，这里设为5秒
             return response.newBuilder()
                 .header("Cache-Control", "public, max-age=$onlineCacheTime")
                 .removeHeader("Pragma")
@@ -32,7 +32,7 @@ object CacheInterceptor {
             var request = chain.request()
             if (!ConnectUtils.isNetworkConnected()) {
                 val offlineCacheTime = TimeUnit.DAYS.toSeconds(14)
-                //离线缓存的过期时间为14天，如果缓存过期将会正常抛出访问失败的异常
+                //离线缓存的过期时间为14天，如果无网络且缓存过期将会正常抛出访问失败的异常
 
                 request = request.newBuilder()
                     .header(
@@ -46,8 +46,8 @@ object CacheInterceptor {
     }
 
     fun buildCache():Cache{
-        val f = File(App.context.cacheDir,"OkHttpCache")
-        val size:Long = 50*1024*1024
+        val f = File(App.context.cacheDir,"OkHttpCache")//设置缓存本地保存的地址
+        val size:Long = 50*1024*1024 //设置最大缓存
         return Cache(f,size)
     }
 }

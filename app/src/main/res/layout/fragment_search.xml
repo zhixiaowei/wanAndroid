@@ -19,6 +19,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:singleLine="true"
+            android:imeOptions="actionSearch"
             android:hint="发现"
             />
 
@@ -47,6 +48,17 @@
             android:orientation="vertical"
             android:id="@+id/historyLayout"
             >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="搜索热词"
+                android:textSize="@dimen/qb_px_16"
+                android:layout_alignParentLeft="true"
+                android:padding="@dimen/qb_px_15"
+                android:textColor="#3592c4"
+                />
+
             <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/tagLayout"
                 android:layout_width="match_parent"
@@ -64,7 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="搜索历史"
-                    android:textSize="@dimen/qb_px_20"
+                    android:textSize="@dimen/qb_px_16"
                     android:layout_alignParentLeft="true"
                     android:padding="@dimen/qb_px_15"
                     android:textColor="#3592c4"
@@ -75,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="清空"
-                    android:textSize="@dimen/qb_px_20"
+                    android:textSize="@dimen/qb_px_16"
                     android:layout_alignParentRight="true"
                     android:padding="15dp"
                     />

@@ -1,5 +1,6 @@
 package com.huangxiaowei.wanandroid
 
+import android.view.View
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 
@@ -20,5 +21,8 @@ class ExampleInstrumentedTest {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("com.huangxiaowei.wanandroid", appContext.packageName)
+
+        val view:View?= null
+        view?.measuredWidth
     }
 }
