@@ -5,7 +5,9 @@ import android.view.View
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.adaptor.OnItemClickListener
 import com.huangxiaowei.wanandroid.adaptor.TodoListAdapter
+import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.client.RequestCtrl.TODO
+import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
 import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
 import com.huangxiaowei.wanandroid.ui.BaseFragment
@@ -36,42 +38,55 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
                     }else{
                         TODO.STATUS_TO_UNFINISH
                     }
-                    TODO.update(data.id,data.title,data.content,data.dateStr,status){
-                        if (it){
-                            if (data.status == TODO.STATUS_TO_UNFINISH){
-                                data.status = TODO.STATUS_TO_FINISH
+                    TODO.update(data.id,data.title,data.content,data.dateStr,status,1,1,object:RequestCtrl.IRequestCallback<Boolean> {
+                        override fun onError(status: Int, msg: String) {
 
-                                doList?.remove(data)
-                                finishList?.add(data)
-                            }else{
-                                data.status = TODO.STATUS_TO_UNFINISH
-                                finishList?.remove(data)
-                                doList?.add(data)
-                            }
+                        }
 
-                            adapter?.apply {
-                                clear()
-                                if (current == CURRENT_DO_LIST){
-                                    doList?.apply { addList(this) }
+                        override fun onSuccess(args: Boolean) {
+                            if (args){
+                                if (data.status == TODO.STATUS_TO_UNFINISH){
+                                    data.status = TODO.STATUS_TO_FINISH
+
+                                    doList?.remove(data)
+                                    finishList?.add(data)
                                 }else{
-                                    finishList?.apply { addList(finishList) }
+                                    data.status = TODO.STATUS_TO_UNFINISH
+                                    finishList?.remove(data)
+                                    doList?.add(data)
+                                }
+
+                                adapter?.apply {
+                                    clear()
+                                    if (current == CURRENT_DO_LIST){
+                                        doList?.apply { addList(this) }
+                                    }else{
+                                        finishList?.apply { addList(finishList) }
+                                    }
                                 }
                             }
                         }
-                    }
+                    })
                 }
                 R.id.todoDeleteBtn->{
-                    TODO.delete(data.id){
-                        if (it){
-                            if (current == CURRENT_DO_LIST){
-                                doList?.apply { remove(data) }
-                            }else{
-                                finishList?.apply { remove(data) }
-                            }
+                    TODO.delete(data.id,object:RequestCtrl.IRequestCallback<Boolean>{
+                        override fun onError(status: Int, msg: String) {
 
-                            adapter!!.remove(data)
                         }
-                    }
+
+                        override fun onSuccess(arg: Boolean) {
+                            if (arg){
+                                if (current == CURRENT_DO_LIST){
+                                    doList?.apply { remove(data) }
+                                }else{
+                                    finishList?.apply { remove(data) }
+                                }
+
+                                adapter!!.remove(data)
+                            }
+                        }
+
+                    })
                 }
             }
         }
@@ -135,61 +150,64 @@ class TODOFragment :BaseFragment(),OnItemClickListener {
                     dialog: AddTodoDialog,
                     todo: TodoBean
                 ) {
-                    TODO.add(todo.title, todo.content, todo.completeDateStr) {
-
-                        if (it) {
-                            showToast("添加成功！")
-                            doList!!.add(todo)
-                            adapter!!.addList(listOf(todo))
-                            dialog.dismiss()
-                        } else {
-                            showToast("添加失败！")
+                    TODO.add(todo.title, todo.content, todo.completeDateStr,1,1,object:RequestCtrl.IRequestCallback<Boolean> {
+                        override fun onSuccess(bean: Boolean) {
+                           if (bean) {
+                                showToast("添加成功！")
+                                doList!!.add(todo)
+                                adapter!!.addList(listOf(todo))
+                                dialog.dismiss()
+                            } else {
+                                showToast("添加失败！")
+                            }
                         }
-                    }
 
-                    dialog.dismiss()
+                        override fun onError(status: Int, msg: String) {
+
+                        }
+                    })
                 }
 
                 override fun onCancel() {
 
                 }
             })
-            d.show(childFragmentManager,"HHHHHH")
-
         }
     }
 
     private fun loadList(status:Int){
 
-        TODO.query(0,TODO.ORDER_CREATE_DATE_POSITIVE,status){ bean ->
+        TODO.query(0,TODO.ORDER_CREATE_DATE_POSITIVE,status,null,null,object:RequestCtrl.IRequestCallback<QueryTodoBean>{
+            override fun onSuccess(bean: QueryTodoBean) {
 
-            if (bean == null){
-                return@query
-            }
-
-            bean.datas?.apply {
-                if (adapter == null){
-                    adapter = TodoListAdapter(attackActivity,ArrayList(this))
-                    adapter!!.setOnItemClickListener(this@TODOFragment)
-                    todoList.adapter = adapter
-                }else if (bean.curPage == 0||bean.curPage == 1) {
-                    adapter?.apply {
-                        clear()
-                        addList(bean.datas)
+                bean.datas?.apply {
+                    if (adapter == null){
+                        adapter = TodoListAdapter(attackActivity,ArrayList(this))
+                        adapter!!.setOnItemClickListener(this@TODOFragment)
+                        todoList.adapter = adapter
+                    }else if (bean.curPage == 0||bean.curPage == 1) {
+                        adapter?.apply {
+                            clear()
+                            addList(bean.datas)
+                        }
+                    }else{
+                        adapter?.addList(bean.datas)
                     }
-                }else{
-                    adapter?.addList(bean.datas)
-                }
 
-                if (status == TODO.STATUS_TO_FINISH){
-                    if (finishList==null){finishList = ArrayList()}else{finishList!!.clear()}
-                    finishList!!.addAll(adapter!!.getList())
-                }else if(status == TODO.STATUS_TO_UNFINISH){
-                    if (doList==null){doList = ArrayList()}else{doList!!.clear()}
-                    doList!!.addAll(adapter!!.getList())
+                    if (status == TODO.STATUS_TO_FINISH){
+                        if (finishList==null){finishList = ArrayList()}else{finishList!!.clear()}
+                        finishList!!.addAll(adapter!!.getList())
+                    }else if(status == TODO.STATUS_TO_UNFINISH){
+                        if (doList==null){doList = ArrayList()}else{doList!!.clear()}
+                        doList!!.addAll(adapter!!.getList())
+                    }
                 }
             }
-        }
+
+            override fun onError(status: Int, msg: String) {
+
+            }
+        })
     }
 
 }

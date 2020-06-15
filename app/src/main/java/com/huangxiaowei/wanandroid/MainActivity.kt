@@ -8,6 +8,7 @@ import android.widget.Button
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
+import com.huangxiaowei.wanandroid.receiver.NetworkReceiver
 import com.huangxiaowei.wanandroid.ui.*
 import com.huangxiaowei.wanandroid.ui.fragment.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -56,6 +57,12 @@ class MainActivity : BaseFragmentActivity(),View.OnClickListener,IOnLoginCallbac
         LoginStateManager.addLoginStateListener(false,this.javaClass.name,this)
         bottomBtn = arrayOf(main_home,main_user,main_weChat,main_square)
         updateBottomBtnStatus(main_home)
+
+        NetworkReceiver.setINetworkStatusCallback(true,object:NetworkReceiver.INetworkStatusCallback{
+            override fun onNetworkStatusChange(isAvailable: Boolean) {
+                networkTip.visibility = if (isAvailable){View.GONE}else{View.VISIBLE}
+            }
+        })
     }
 
     override fun onClick(view: View) {

@@ -10,12 +10,12 @@ import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.Coin
 import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
+import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
 import com.huangxiaowei.wanandroid.data.bean.weChatListBean.WeChatListBean
 import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListBean
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.globalStatus.ioScope
 import com.huangxiaowei.wanandroid.globalStatus.uiScope
-import com.huangxiaowei.wanandroid.showToast
 import kotlinx.coroutines.launch
 
 object RequestCtrl {
@@ -28,10 +28,8 @@ object RequestCtrl {
      * 请求文章列表
      * 获取第[requestPage]页的文章列表
      *
-     * 如果请求成功，则[callback]回调的的页码会和请求的[requestPage]一致，
-     * 但如果请求失败，则返回0，可能会存在并获取本地缓存，但也只保存首页
      */
-    fun requestArticleList(requestPage:Int = 0,callback:(page:Int,reply:ArticleListBean)->Unit){
+    fun requestArticleList(requestPage:Int = 0,callback: IRequestCallback<ArticleListBean>){
 
         ioScope.launch {
             httpClient.doGet("${baseUrl}/article/list/${requestPage}/json",object:HttpClient.OnIRequestResult{
@@ -42,16 +40,16 @@ object RequestCtrl {
                     if (response.isSuccess()){
                         val bean = response.parseObject(ArticleListBean::class.java)
 
-                        uiScope.launch { callback(requestPage,bean) }//更新UI
+                        uiScope.launch { callback.onSuccess(bean) }//更新UI
                     }else{
-                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为" +
-                                "[${response.getResultCode()}]," + response.getErrorMsg()),"")
+                        callback.onError()
                         return
                     }
                 }
 
-                override fun onError(e: Exception, response: String) {
-                    e.printStackTrace()
+                override fun onError(e: Exception?, response: String) {
+                    e?.printStackTrace()
+                    uiScope.launch { callback.onError() }
                 }
             })
         }
@@ -61,26 +59,25 @@ object RequestCtrl {
     /**
      * 获取首页的banner
      */
-    fun requestBanner(callback: (reply: BannerBean) -> Unit){
+    fun requestBanner(callback: IRequestCallback<BannerBean>){
 
         ioScope.launch {
             httpClient.doGet("$baseUrl/banner/json",object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
 
-                    val response = WanResponseAnalyst(json)
+                    val reply = WanResponseAnalyst(json)
 
-                    if (response.isSuccess()) {
-                        val bean = JSON.parseObject(json, BannerBean::class.java)
-
-                        uiScope.launch { callback(bean) }//更新UI
-                    } else {
-                        val resultMsg = response.getErrorMsg()
-                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[${response.getResultCode()}],$resultMsg"),"")
+                    uiScope.launch {
+                        if (reply.isSuccess()){
+                            callback.onSuccess(JSON.parseObject(json, BannerBean::class.java))
+                        }else{
+                            callback.onError()
+                        }
                     }
                 }
 
-                override fun onError(e: Exception, response: String) {
-
+                override fun onError(e: Exception?, response: String) {
+                    uiScope.launch { callback.onError() }
                 }
 
             })
@@ -90,7 +87,7 @@ object RequestCtrl {
     /**
      * 请求登录
      */
-    fun requestLogin(userName:String,password:String,callback: (bean:UserBean?) -> Unit){
+    fun requestLogin(userName:String,password:String,callback: IRequestCallback<UserBean>){
 
         ioScope.launch {
 
@@ -105,22 +102,18 @@ object RequestCtrl {
                     if (response.isSuccess()) {
                         val data = response.getData()
                         val bean = response.parseObject(UserBean::class.java)
-                        uiScope.launch { callback(bean) }//更新UI
+                        uiScope.launch { callback.onSuccess(bean) }//更新UI
 
                         bean.password = password
 
                         LoginStateManager.login(data,bean)
                     } else {
-                        val resultMsg = response.getErrorMsg()
-                        onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为[${response.getResultCode()}],$resultMsg"),resultMsg)
+                        uiScope.launch { callback.onError() }
                     }
                 }
 
-                override fun onError(e: Exception, response: String) {
-                    uiScope.launch {
-                        showToast(response)//请先登录
-                        callback(null)
-                    }
+                override fun onError(e: Exception?, response: String) {
+                    uiScope.launch { callback.onError() }
                 }
             })
         }
@@ -129,13 +122,13 @@ object RequestCtrl {
     /**
      * 请求登出
      */
-    fun requestLogout(callback: (result:Boolean) -> Unit){
+    fun requestLogout(callback: IRequestCallback<Boolean>){
 
         ioScope.launch {
             httpClient.doGet("https://www.wanandroid.com/user/logout/json",object:HttpClient.OnIRequestResult{
-                override fun onError(e: Exception, response: String) {
+                override fun onError(e: Exception?, response: String) {
                     uiScope.launch {
-                        callback(false)
+                        callback.onError()
                     }
                 }
 
@@ -145,7 +138,7 @@ object RequestCtrl {
                     val isOk = response.isSuccess()||response.isLoginInvalid()
 
                     uiScope.launch {
-                        callback(isOk)
+                        callback.onSuccess(isOk)
 
                         if (isOk){
                             LoginStateManager.logout()
@@ -156,35 +149,37 @@ object RequestCtrl {
         }
     }
 
-    fun requestCollect(id:Int,callback: (result:Boolean) -> Unit){
+    fun requestCollect(id:Int,callback: IRequestCallback<Boolean>){
         val url = "$baseUrl/lg/collect/$id/json"
 
         httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
-            override fun onError(e: Exception, response: String) {
-
+            override fun onError(e: Exception?, response: String) {
+                callback.onError()
             }
 
             override fun onSuccess(json: String) {
                 val reply = WanResponseAnalyst(json)
                 if (reply.isSuccess()){
-                    callback(true)
+                    callback.onSuccess(true)
+                }else{
+                    callback.onError()
                 }
             }
         })
     }
 
-    fun requestUNCollect(id:Int,callback: (result:Boolean) -> Unit){
+    fun requestUNCollect(id:Int,callback: IRequestCallback<Boolean>){
         val url = "https://www.wanandroid.com/lg/uncollect_originId/$id/json"
 
         httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
-            override fun onError(e: Exception, response: String) {
-
+            override fun onError(e: Exception?, response: String) {
+                callback.onError()
             }
 
             override fun onSuccess(json: String) {
                 val reply = WanResponseAnalyst(json)
 
-                callback(reply.isSuccess())
+                callback.onSuccess(reply.isSuccess())
             }
         })
     }
@@ -192,37 +187,27 @@ object RequestCtrl {
     /**
      * 请求收藏的文章
      */
-    fun requestCollectArticles(page:Int,callback:(isLoginInvalid:Boolean,page:Int,reply:CollectArticleListBean)->Unit){
+    fun requestCollectArticles(page:Int, callback: IRequestCallback<CollectArticleListBean>){
         ioScope.launch {
             httpClient.doGet("$baseUrl/lg/collect/list/$page/json",object:HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
-                    val response = WanResponseAnalyst(json)
-
-                    when {
-                        response.isSuccess() -> {
-
-                            val bean = response.parseObject(CollectArticleListBean::class.java)
-                            uiScope.launch { callback(false,page,bean) }//更新UI
-                        }else -> {
-                            uiScope.launch { showToast(response.getErrorMsg()) }
-                            onError(Exception("服务器已应答，但返回结果为请求失败!返回状态码为" +
-                                    "[${response.getResultCode()}]," + response.getErrorMsg()),response.getErrorMsg())
-                            return
-                        }
-                    }
-                }
-
-                override fun onError(e: Exception, response: String) {
-
-                    e.printStackTrace()
-
-                    //请求服务器返回异常，则加载本地数据
-                    val bean = CollectArticleListBean()
+                    val reply = WanResponseAnalyst(json)
 
                     uiScope.launch {
-//                        showToast("访问服务器失败，请检查网络状态是否正常")
-                        callback(true,0,bean)
+                        if (reply.isSuccess()){
+                            val bean = reply.parseObject(CollectArticleListBean::class.java)
+                            callback.onSuccess(bean) //更新UI
+                        }else{
+                            callback.onError()
+                        }
                     }
+
+                }
+
+                override fun onError(e: Exception?, response: String) {
+
+                    e?.printStackTrace()
+                    callback.onError()
                 }
             })
         }
@@ -231,55 +216,57 @@ object RequestCtrl {
     /**
      * 获取个人积分（需登录）
      */
-    fun requestCoinCount(callback: (bean: CoinCountBean?) -> Unit){
+    fun requestCoinCount(callback: IRequestCallback<CoinCountBean>){
         val url = "$baseUrl/lg/coin/userinfo/json"
 
         httpClient.doGet(url,object:HttpClient.OnIRequestResult{
-            override fun onError(e: Exception, response: String) {
-                //请求失败，检查网络
-                e.printStackTrace()
+            override fun onError(e: Exception?, response: String) {
+
+                e?.printStackTrace()
                 uiScope.launch {
-                    callback(null)
+                    callback.onError()
                 }
             }
 
             override fun onSuccess(json: String) {
-                val response = WanResponseAnalyst(json)
-                when {
-                    response.isSuccess() -> {
-                        uiScope.launch { callback(response.parseObject(CoinCountBean::class.java)) }
+                val reply = WanResponseAnalyst(json)
+                uiScope.launch {
+                    if (reply.isSuccess()){
+                        callback.onSuccess(reply.parseObject(CoinCountBean::class.java))
+                    }else{
+                        callback.onError()
                     }
-                    else -> {
-                        //请求失败
-                        uiScope.launch {
-                            callback(null)
-                        }
 
-                    }
                 }
             }
         })
     }
 
-    fun requestSearch(msg:String,page:Int = 0,callback: (reply: ArticleListBean) -> Unit){
+    fun requestSearch(msg:String,page:Int = 0,callback:IRequestCallback<ArticleListBean>){
 
         val url = "$baseUrl/article/query/$page/json"
 
         val form = ArrayMap<String,String>()
         form["k"] = msg
         httpClient.doPost(url,form,object :HttpClient.OnIRequestResult{
-            override fun onError(e: Exception, response: String) {
-
+            override fun onError(e: Exception?, response: String) {
+                uiScope.launch { callback.onError() }
             }
 
             override fun onSuccess(json: String) {
+                if (json.isBlank()){
+                    //断网状态下可能返回空字符串
+                    uiScope.launch { callback.onError() }
+                    return
+                }
+
                 val reply = WanResponseAnalyst(json)
 
                 uiScope.launch {
                     if (reply.isSuccess()){
-                        callback(reply.parseObject(ArticleListBean::class.java))
+                        callback.onSuccess(reply.parseObject(ArticleListBean::class.java))
                     }else{
-
+                        callback.onError()
                     }
                 }
 
@@ -291,11 +278,11 @@ object RequestCtrl {
     /**
      * 获取搜索热词
      */
-    fun requeryHotKey(callback: (bean:HotKeyBean) -> Unit){
+    fun requeryHotKey(callback: IRequestCallback<HotKeyBean>?){
         val url = "$baseUrl//hotkey/json"
         httpClient.doGet(url,object:HttpClient.OnIRequestResult{
-            override fun onError(e: Exception, response: String) {
-
+            override fun onError(e: Exception?, response: String) {
+                uiScope.launch { callback?.onError() }
             }
 
             override fun onSuccess(json: String) {
@@ -304,9 +291,9 @@ object RequestCtrl {
                 uiScope.launch {
                     if (reply.isSuccess()){
                         val bean = reply.parseObject(HotKeyBean::class.java)
-                        callback(bean)
+                        callback?.onSuccess(bean)
                     }else{
-
+                        callback?.onError()
                     }
                 }
 
@@ -318,11 +305,11 @@ object RequestCtrl {
     /**
      * 获取积分详情
      */
-    fun requestCoinCountDetails(callback:(bean:CoinCountDetailsBean?)->Unit){
+    fun requestCoinCountDetails(callback: IRequestCallback<CoinCountDetailsBean>){
         val url = "$baseUrl//lg/coin/list/1/json"
         httpClient.doGet(url,object:HttpClient.OnIRequestResult{
-            override fun onError(e: Exception, response: String) {
-
+            override fun onError(e: Exception?, response: String) {
+                uiScope.launch { callback?.onError() }
             }
 
             override fun onSuccess(json: String) {
@@ -330,9 +317,9 @@ object RequestCtrl {
 
                 uiScope.launch {
                     if (reply.isSuccess()){
-                        callback(reply.parseObject(CoinCountDetailsBean::class.java))
+                        callback?.onSuccess(reply.parseObject(CoinCountDetailsBean::class.java))
                     }else{
-
+                        callback?.onError()
                     }
                 }
             }
@@ -344,11 +331,11 @@ object RequestCtrl {
         /**
          * 获取公众号列表
          */
-        fun requestWeChatList(callback: (bean:WeChatListBean) -> Unit){
+        fun requestWeChatList(callback: IRequestCallback<WeChatListBean>?){
             val url = "$baseUrl/wxarticle/chapters/json"
             httpClient.doGet(url,object:HttpClient.OnIRequestResult{
-                override fun onError(e: Exception, response: String) {
-
+                override fun onError(e: Exception?, response: String) {
+                    uiScope.launch { callback?.onError() }
                 }
 
                 override fun onSuccess(json: String) {
@@ -356,7 +343,9 @@ object RequestCtrl {
                     uiScope.launch {
                         val reply = WanResponseAnalyst(json)
                         if (reply.isSuccess()){
-                            callback(reply.parseObject(WeChatListBean::class.java))
+                            callback?.onSuccess(reply.parseObject(WeChatListBean::class.java))
+                        }else{
+                            callback?.onError()
                         }
                     }
 
@@ -364,7 +353,8 @@ object RequestCtrl {
             })
         }
 
-        fun requestHistory(id:Int,page:Int = 1,key: String? = null,callback: (bean: WeChatArticleListBean) -> Unit){
+        fun requestHistory(id:Int,page:Int = 1,key: String? = null
+                           ,callback: IRequestCallback<WeChatArticleListBean>){
             val url = "$baseUrl/wxarticle/list/$id/$page/json"+if (key != null){
                 "?k=$key"
             }else{
@@ -372,8 +362,8 @@ object RequestCtrl {
             }
 
             httpClient.doGet(url,object:HttpClient.OnIRequestResult{
-                override fun onError(e: Exception, response: String) {
-
+                override fun onError(e: Exception?, response: String) {
+                    uiScope.launch { callback.onError() }
                 }
 
                 override fun onSuccess(json: String) {
@@ -382,7 +372,9 @@ object RequestCtrl {
                     uiScope.launch {
                         if (reply.isSuccess()){
                             val bean = reply.parseObject(WeChatArticleListBean::class.java)
-                            callback(bean)
+                            callback.onSuccess(bean)
+                        }else{
+                            callback.onError()
                         }
                     }
 
@@ -402,7 +394,13 @@ object RequestCtrl {
         const val STATUS_TO_UNFINISH = 0//从完成到未完成
         const val STATUS_TO_FINISH = 1//从未完成到完成
 
-        fun add(title:String,context:String,date:String,type:Int = 1,priority:Int = 1,callback: (result: Boolean) -> Unit){
+        fun add(title:String
+                ,context:String
+                ,date:String
+                ,type:Int = 1
+                ,priority:Int = 1
+                ,callback: IRequestCallback<Boolean>){
+
             val url = "$baseUrl/lg/todo/add/json"
 
             val from = ArrayMap<String,String>()
@@ -413,14 +411,18 @@ object RequestCtrl {
             from["priority"] = priority.toString()
 
             httpClient.doPost(url,from,object:HttpClient.OnIRequestResult{
-                override fun onError(e: Exception, response: String) {
-
+                override fun onError(e: Exception?, response: String) {
+                    uiScope.launch { callback.onError() }
                 }
 
                 override fun onSuccess(json: String) {
                     uiScope.launch {
                         val reply = WanResponseAnalyst(json)
-                        callback(reply.isSuccess())
+                        if (reply.isSuccess()){
+                            callback.onSuccess(true)
+                        }else{
+                            callback.onError()
+                        }
                     }
 
                 }
@@ -437,7 +439,7 @@ object RequestCtrl {
          */
         fun query(page:Int,orderBy:Int = ORDER_CREATE_DATE_POSITIVE
                   ,status:Int = -1,type:Int? = null,priority:Int? = null
-                  ,callback: (bean: QueryTodoBean?) -> Unit){
+                  ,callback: IRequestCallback<QueryTodoBean>){
 
             val url = "$baseUrl/lg/todo/v2/list/$page/json" +
                     "?status=$status&orderby=$orderBy" +
@@ -445,8 +447,8 @@ object RequestCtrl {
                     if (priority!=null){"&priority=$priority"}else{""}
 
             httpClient.doGet(url,object:HttpClient.OnIRequestResult{
-                override fun onError(e: Exception, response: String) {
-
+                override fun onError(e: Exception?, response: String) {
+                    uiScope.launch { callback.onError() }
                 }
 
                 override fun onSuccess(json: String) {
@@ -454,9 +456,9 @@ object RequestCtrl {
                     uiScope.launch {
                         val reply = WanResponseAnalyst(json)
                         if (reply.isSuccess()){
-                            callback(reply.parseObject(QueryTodoBean::class.java))
+                            callback.onSuccess(reply.parseObject(QueryTodoBean::class.java))
                         }else{
-
+                            callback.onError()
                         }
                     }
 
@@ -465,17 +467,17 @@ object RequestCtrl {
 
         }
 
-        fun delete(id:Int,callback: (result: Boolean) -> Unit){
+        fun delete(id:Int,callback: IRequestCallback<Boolean>){
             val url = "$baseUrl/lg/todo/delete/$id/json"
             httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
-                override fun onError(e: Exception, response: String) {
-
+                override fun onError(e: Exception?, response: String) {
+                    uiScope.launch { callback.onError() }
                 }
 
                 override fun onSuccess(json: String) {
                     uiScope.launch {
                         val reply = WanResponseAnalyst(json)
-                        callback(reply.isSuccess())
+                        callback.onSuccess(reply.isSuccess())
                     }
 
                 }
@@ -483,8 +485,15 @@ object RequestCtrl {
             })
         }
 
-        fun update(id:Int,title:String,context:String,date:String,status: Int = STATUS_TO_UNFINISH,type:Int = 1,priority:Int = 1,
-                   callback: (result: Boolean) -> Unit){
+        fun update(
+            id:Int,
+            title:String,
+            context:String,
+            date:String,
+            status: Int = STATUS_TO_UNFINISH,
+            type: Int = 1,
+            priority:Int = 1,
+            callback: IRequestCallback<Boolean>){
             val url = "$baseUrl/lg/todo/update/$id/json"
 
             val from = ArrayMap<String,String>()
@@ -498,8 +507,8 @@ object RequestCtrl {
 
 
             httpClient.doPost(url,from,object:HttpClient.OnIRequestResult{
-                override fun onError(e: Exception, response: String) {
-
+                override fun onError(e: Exception?, response: String) {
+                    uiScope.launch { callback.onError() }
                 }
 
                 override fun onSuccess(json: String) {
@@ -507,9 +516,9 @@ object RequestCtrl {
 
                     uiScope.launch {
                         if (reply.isSuccess()){
-                            callback(true)
+                            callback.onSuccess(true)
                         }else{
-                            callback(false)
+                            callback.onError()
                         }
                     }
 
@@ -517,5 +526,11 @@ object RequestCtrl {
 
             })
         }
+    }
+
+
+    interface IRequestCallback<T>{
+        fun onSuccess(bean:T)
+        fun onError(status: Int = -1,msg: String = "")
     }
 }

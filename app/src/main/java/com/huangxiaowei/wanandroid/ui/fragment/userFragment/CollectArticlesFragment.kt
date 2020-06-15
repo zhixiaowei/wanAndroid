@@ -26,28 +26,27 @@ class CollectArticlesFragment: BaseFragment() {
         updateCollectList()
     }
 
-    fun updateCollectList(page:Int = 0){
-        RequestCtrl.requestCollectArticles(page){
-                isLoginInvalid:Boolean,
-                returnPage:Int,
-                bean: CollectArticleListBean ->
-
-            if (isLoginInvalid){
-                return@requestCollectArticles
-            }
-
-            if (articleAdapter == null){
-                articleAdapter = CollectArticleListAdapter(attackActivity,bean)
-                articleList.adapter = articleAdapter
-            }else if (returnPage == 0){
-                articleAdapter!!.apply {
-                    clear()
-                    addList(bean)
+    private fun updateCollectList(page:Int = 0){
+        RequestCtrl.requestCollectArticles(page,object:RequestCtrl.IRequestCallback<CollectArticleListBean>{
+            override fun onSuccess(bean: CollectArticleListBean) {
+                if (articleAdapter == null){
+                    articleAdapter = CollectArticleListAdapter(attackActivity,bean)
+                    articleList.adapter = articleAdapter
+                }else if (bean.curPage == 0){
+                    articleAdapter!!.apply {
+                        clear()
+                        addList(bean)
+                    }
+                }else {
+                    articleAdapter!!.addList(bean)
                 }
-            }else {
-                articleAdapter!!.addList(bean)
             }
-        }
+
+            override fun onError(status: Int, msg: String) {
+
+            }
+
+        })
     }
 
     override fun getLayout(): Int {

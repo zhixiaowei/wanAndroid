@@ -5,6 +5,7 @@ import android.view.View
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.adaptor.CoinDetailsListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
+import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.CoinCountDetailsBean
 import com.huangxiaowei.wanandroid.ui.BaseFragment
 import kotlinx.android.synthetic.main.fragment_user_coin.*
 
@@ -14,12 +15,16 @@ class CoinCountDetailsFragment:BaseFragment() {
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
 
-        RequestCtrl.requestCoinCountDetails {
-            it?.run {
-                adapter = CoinDetailsListAdapter(attackActivity,this)
+        RequestCtrl.requestCoinCountDetails(object:RequestCtrl.IRequestCallback<CoinCountDetailsBean>{
+            override fun onSuccess(bean: CoinCountDetailsBean) {
+                adapter = CoinDetailsListAdapter(attackActivity,bean)
                 coinList.adapter = adapter
             }
-        }
+
+            override fun onError(status: Int, msg: String) {
+
+            }
+        })
     }
 
     override fun getLayout(): Int {

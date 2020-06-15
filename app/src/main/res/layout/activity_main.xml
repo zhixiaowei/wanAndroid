@@ -3,8 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:text="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/networkTip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="网络连接不可用"
+        android:layout_gravity="center"
+        android:drawableStart="@drawable/warn"
+        android:textSize="@dimen/qb_px_20"
+        android:drawablePadding="@dimen/qb_px_5"
+        android:padding="@dimen/qb_px_5"
+        android:visibility="gone"
+        >
+
+    </TextView>
 
     <FrameLayout
         android:id="@+id/fragmentContainer"

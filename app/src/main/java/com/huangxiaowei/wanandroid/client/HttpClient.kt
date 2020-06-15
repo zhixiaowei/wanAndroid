@@ -3,11 +3,14 @@ package com.huangxiaowei.wanandroid.client
 import android.util.ArrayMap
 import android.util.Log
 import com.huangxiaowei.wanandroid.client.cookie.SuperCookie
+import com.huangxiaowei.wanandroid.showToast
+import com.huangxiaowei.wanandroid.ui.ConnectUtils
 import com.huangxiaowei.wanandroid.utils.Logger
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.net.ConnectException
 
 class HttpClient {
 
@@ -30,6 +33,13 @@ class HttpClient {
     }
 
     private fun toPost(uri: String,data: Any,callback:OnIRequestResult?){
+
+        if (!ConnectUtils.isNetworkConnected()){
+            showToast("网络连接不可用！")
+            callback?.onError(ConnectException(),"当前网络不可用")
+            return
+        }
+
         val body = buildRequestBody(data)
             ?: throw Exception("当前Post参数仅支持表单键值对或JSON格式的字符串")
 
@@ -107,7 +117,7 @@ class HttpClient {
     }
 
     interface OnIRequestResult{
-        fun onError(e:Exception,response:String)
+        fun onError(e:Exception? =null,response:String = "")
 
         fun onSuccess(json: String)
     }

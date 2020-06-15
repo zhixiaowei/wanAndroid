@@ -5,25 +5,25 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.adaptor.ArticleListAdapter
+import com.huangxiaowei.wanandroid.adaptor.HistoryAdapter
+import com.huangxiaowei.wanandroid.adaptor.OnItemClickListener
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
+import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
+import com.huangxiaowei.wanandroid.data.litepal.SearchHistoryBean
 import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.ui.BaseFragment
 import com.huangxiaowei.wanandroid.ui.view.SuperListView
-import kotlinx.android.synthetic.main.fragment_search.*
-import kotlinx.android.synthetic.main.include_article_list.*
-import android.view.ViewGroup
-import com.huangxiaowei.wanandroid.adaptor.HistoryAdapter
-import com.huangxiaowei.wanandroid.adaptor.OnItemClickListener
-import com.huangxiaowei.wanandroid.data.litepal.SearchHistoryBean
 import com.huangxiaowei.wanandroid.utils.SoftKeyboardUtils
 import com.huangxiaowei.wanandroid.utils.ViewUtils
+import kotlinx.android.synthetic.main.fragment_search.*
+import kotlinx.android.synthetic.main.include_article_list.*
 import org.litepal.LitePal
-import org.litepal.crud.LitePalSupport
 
 class SearchFragment: BaseFragment(){
 
@@ -45,6 +45,7 @@ class SearchFragment: BaseFragment(){
                 showToast("检索内容不能为空")
                 return@setOnClickListener
             }
+
             search_tv.setSelection(text.length)
             showToast("检索：$text")
             articleRefresh.isRefreshing = true
@@ -80,27 +81,34 @@ class SearchFragment: BaseFragment(){
 
         })
 
-        RequestCtrl.requeryHotKey {
-            for(item in it.data){
+        RequestCtrl.requeryHotKey(object:RequestCtrl.IRequestCallback<HotKeyBean>{
+            override fun onSuccess(bean: HotKeyBean) {
+                for(item in bean.data){
 
-                val layout = LayoutInflater.from(attackActivity).inflate(R.layout.item_hotkey,null) as LinearLayout
-                val hotKeyTv = layout.findViewById<TextView>(R.id.hotkeyTv)
+                    val layout = LayoutInflater.from(attackActivity).inflate(R.layout.item_hotkey,null) as LinearLayout
+                    val hotKeyTv = layout.findViewById<TextView>(R.id.hotkeyTv)
 
-                hotKeyTv.text = item.name
+                    hotKeyTv.text = item.name
 
-                hotKeyTv.setOnClickListener {
-                    search_tv.setText(item.name)
-                    search_btn.performClick()
+                    hotKeyTv.setOnClickListener {
+                        search_tv.setText(item.name)
+                        search_btn.performClick()
+                    }
+
+                    if (hotKeyTv.parent != null){
+                        val parent = hotKeyTv.parent as ViewGroup
+                        parent.removeAllViews()
+                    }
+
+                    tagLayout.addView(hotKeyTv)
                 }
-
-                if (hotKeyTv.parent != null){
-                    val parent = hotKeyTv.parent as ViewGroup
-                    parent.removeAllViews()
-                }
-
-                tagLayout.addView(hotKeyTv)
             }
-        }
+
+            override fun onError(status: Int, msg: String) {
+
+            }
+
+        })
 
         val list = LitePal.findAll(SearchHistoryBean::class.java).sortedByDescending { it.time }
 
@@ -192,33 +200,39 @@ class SearchFragment: BaseFragment(){
         }
 
 
-        RequestCtrl.requestSearch(searchText,page){bean: ArticleListBean ->
-
-            this.mPage = bean.curPage
-            bottom_tip.visibility = View.GONE
-            SoftKeyboardUtils.hideSoftKeyboard(attackActivity)
-
-            articleRefresh.isRefreshing = false
-
-            if (bean.curPage == 1||bean.curPage == 0){
-
-            }else if (bean.over){
-                showToast("再往下拉也没有啦！")
-                return@requestSearch
+        RequestCtrl.requestSearch(searchText,page,object:RequestCtrl.IRequestCallback<ArticleListBean>{
+            override fun onError(status: Int, msg: String) {
+                articleRefresh.isRefreshing = false
             }
 
-            if (articleAdapter == null){
-                articleAdapter = ArticleListAdapter(attackActivity,bean)
-                articleList.adapter = articleAdapter
-            }else if (mPage == 0){
-                articleAdapter!!.apply {
-                    clear()
-                    addList(bean)
+            override fun onSuccess(bean: ArticleListBean) {
+                mPage = bean.curPage
+                bottom_tip.visibility = View.GONE
+                SoftKeyboardUtils.hideSoftKeyboard(attackActivity)
+
+                articleRefresh.isRefreshing = false
+
+                if (bean.curPage == 1||bean.curPage == 0){
+
+                }else if (bean.over){
+                    showToast("再往下拉也没有啦！")
+                    return
                 }
-            }else {
-                articleAdapter!!.addList(bean)
+
+                if (articleAdapter == null){
+                    articleAdapter = ArticleListAdapter(attackActivity,bean)
+                    articleList.adapter = articleAdapter
+                }else if (mPage == 0){
+                    articleAdapter!!.apply {
+                        clear()
+                        addList(bean)
+                    }
+                }else {
+                    articleAdapter!!.addList(bean)
+                }
             }
-        }
+        })
+
     }
 
 

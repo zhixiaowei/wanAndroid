@@ -25,6 +25,14 @@
             android:name=".WebActivity"
             android:launchMode="singleInstance"
             />
+
+        <receiver android:name=".receiver.NetworkReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="1000">
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

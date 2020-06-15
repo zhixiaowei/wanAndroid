@@ -28,6 +28,7 @@
         android:layout_height="wrap_content"
         android:hint="输入密码"
         android:textSize="@dimen/qb_px_20"
+        android:inputType="textPassword"
         />
 
     <Button

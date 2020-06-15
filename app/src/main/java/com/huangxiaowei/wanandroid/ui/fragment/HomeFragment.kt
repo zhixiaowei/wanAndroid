@@ -10,6 +10,7 @@ import com.huangxiaowei.wanandroid.adaptor.ArticleListAdapter
 import com.huangxiaowei.wanandroid.adaptor.ImageAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
+import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerItem
 import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.ui.BaseFragment
@@ -46,19 +47,24 @@ class  HomeFragment: BaseFragment(){
      * 更新Banner
      */
     private fun showBanner() {
-        RequestCtrl.requestBanner {
+        RequestCtrl.requestBanner(object:RequestCtrl.IRequestCallback<BannerBean>{
+            override fun onSuccess(bean: BannerBean) {
+                val adapter = ImageAdapter(
+                    attackActivity,
+                    bean
+                )
 
-            val adapter = ImageAdapter(
-                attackActivity,
-                it
-            )
+                bannerView.adapter = adapter
 
-            bannerView.adapter = adapter
-
-            bannerView.setOnBannerListener { data, _ ->
-                WebActivity.startActivity(attackActivity, (data as BannerItem).url)
+                bannerView.setOnBannerListener { data, _ ->
+                    WebActivity.startActivity(attackActivity, (data as BannerItem).url)
+                }
             }
-        }
+
+            override fun onError(status: Int, msg: String) {
+
+            }
+        })
     }
 
     /**
@@ -66,38 +72,43 @@ class  HomeFragment: BaseFragment(){
      */
     private fun updateArticleList(page:Int = 0) {
 
-           RequestCtrl.requestArticleList(page) {
-                   returnPage:Int,
-                   bean:ArticleListBean->
+           RequestCtrl.requestArticleList(page,object:RequestCtrl.IRequestCallback<ArticleListBean>{
+               override fun onSuccess(bean: ArticleListBean) {
 
+                   articleRefresh.isRefreshing = false//停止显示刷新控件
+                   bottom_tip.visibility  = View.INVISIBLE
+                   this@HomeFragment.page = bean.curPage
 
-               articleRefresh.isRefreshing = false//停止显示刷新控件
-               bottom_tip.visibility  = View.INVISIBLE
-               this.page = returnPage
-
-               if (articleAdapter == null){
-                   articleAdapter = ArticleListAdapter(attackActivity,bean)
-                   articleList.adapter = articleAdapter
-               }else if (returnPage == 0){
-                   articleAdapter!!.apply {
-                       clear()
-                       addList(bean)
+                   if (articleAdapter == null){
+                       articleAdapter = ArticleListAdapter(attackActivity,bean)
+                       articleList.adapter = articleAdapter
+                   }else if (bean.curPage == 0){
+                       articleAdapter!!.apply {
+                           clear()
+                           addList(bean)
+                       }
+                   }else {
+                       articleAdapter!!.addList(bean)
                    }
-               }else {
-                   articleAdapter!!.addList(bean)
+
+                   if (page!=0){
+                       if (bean.over){
+                           showToast("再往下拉也没有啦！")
+                           return
+                       }else{
+                           articleList.smoothScrollByOffset(1)//向下滑动一格
+                       }
+                   }
+
+                   showToast("加载完毕")
                }
 
-               if (page!=0){
-                   if (bean.over){
-                       showToast("再往下拉也没有啦！")
-                       return@requestArticleList
-                   }else{
-                       articleList.smoothScrollByOffset(1)//向下滑动一格
-                   }
+               override fun onError(status: Int, msg: String) {
+                   articleRefresh.isRefreshing = false//停止显示刷新控件
                }
 
-               showToast("加载完毕")
-           }
+           })
+
     }
 
     override fun onStart() {
@@ -116,8 +127,11 @@ class  HomeFragment: BaseFragment(){
 
         bannerView.run {
             indicator = CircleIndicator(attackActivity)//Banner下方显示N个小圆点
+
+            val size = getResources().getDimension(R.dimen.qb_px_180)
+
             layoutParams = AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT
-                ,dp2px(150f).toInt())
+                ,size.toInt())
         }
 
         articleList.addHeaderView(bannerView)

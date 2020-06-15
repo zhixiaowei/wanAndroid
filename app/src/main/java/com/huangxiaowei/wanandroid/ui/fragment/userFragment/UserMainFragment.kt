@@ -6,6 +6,7 @@ import android.view.View
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.UserBean
+import com.huangxiaowei.wanandroid.data.bean.coinCount.CoinCountBean
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.ui.BaseFragment
@@ -19,11 +20,15 @@ class UserMainFragment(private val onAgentClickListener: View.OnClickListener):B
         userName.text = user.nickname
 
         //更新积分
-        RequestCtrl.requestCoinCount {
-            it?.apply {
-                this@UserMainFragment.coinCount.text = coinCount.toString()
+        RequestCtrl.requestCoinCount(object:RequestCtrl.IRequestCallback<CoinCountBean>{
+            override fun onSuccess(bean: CoinCountBean) {
+                bean.apply {
+                    this@UserMainFragment.coinCount.text = coinCount.toString()
+                }
             }
-        }
+
+            override fun onError(status: Int, msg: String) {}
+        })
     }
 
     override fun onLogout() {
