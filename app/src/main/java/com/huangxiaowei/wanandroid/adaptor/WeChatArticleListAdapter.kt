@@ -49,20 +49,32 @@ class WeChatArticleListAdapter(private val context: Context,val list:ArrayList<W
 
             setOnClickListener {
                 if (data.collect){
-                    RequestCtrl.requestUNCollect(data.id){
+                    RequestCtrl.requestUNCollect(data.id,object:RequestCtrl.IRequestCallback<Boolean>{
+                        override fun onSuccess(bean: Boolean) {
+                            if (bean){
+                                list[position].collect = false
+                                setImageResource(R.drawable.unlike_)
+                            }
+                        }
 
-                        if (it){
-                            list[position].collect = false
-                            setImageResource(R.drawable.unlike_)
+                        override fun onError(status: Int, msg: String) {
+
                         }
-                    }
+                    })
                 }else{
-                    RequestCtrl.requestCollect(data.id){
-                        if (it){
-                            list[position].collect = true
-                            setImageResource(R.drawable.like_)
+                    RequestCtrl.requestCollect(data.id,object:RequestCtrl.IRequestCallback<Boolean>{
+                        override fun onSuccess(bean: Boolean) {
+                            if (bean){
+                                list[position].collect = true
+                                setImageResource(R.drawable.like_)
+                            }
                         }
-                    }
+
+                        override fun onError(status: Int, msg: String) {
+
+                        }
+
+                    })
                 }
             }
         }

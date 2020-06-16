@@ -309,7 +309,7 @@ object RequestCtrl {
         val url = "$baseUrl//lg/coin/list/1/json"
         httpClient.doGet(url,object:HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
-                uiScope.launch { callback?.onError() }
+                uiScope.launch { callback.onError() }
             }
 
             override fun onSuccess(json: String) {
@@ -317,9 +317,9 @@ object RequestCtrl {
 
                 uiScope.launch {
                     if (reply.isSuccess()){
-                        callback?.onSuccess(reply.parseObject(CoinCountDetailsBean::class.java))
+                        callback.onSuccess(reply.parseObject(CoinCountDetailsBean::class.java))
                     }else{
-                        callback?.onError()
+                        callback.onError()
                     }
                 }
             }

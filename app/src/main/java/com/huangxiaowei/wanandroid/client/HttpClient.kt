@@ -105,9 +105,12 @@ class HttpClient {
 
                     Logger.i("获取到GET应答：${text}",mTAG)
                     callback.onSuccess(text)
-                }else if (response.cacheResponse!=null){
+                }else if (response.cacheResponse!=null&& response.cacheResponse!!.isSuccessful){
                     val text = response.cacheResponse!!.body!!.string()
                     Logger.i("请求网络失败，但是我们获取了缓存：${text}",mTAG)
+                    callback.onSuccess(text)
+                }else{
+                    callback.onError()
                 }
 
 

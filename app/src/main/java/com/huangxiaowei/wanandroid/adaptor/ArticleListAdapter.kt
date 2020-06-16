@@ -52,20 +52,33 @@ class ArticleListAdapter(private val context: Context,listBean: ArticleListBean)
 
             setOnClickListener {
                 if (data.collect){
-                    RequestCtrl.requestUNCollect(data.id){
+                    RequestCtrl.requestUNCollect(data.id,object:RequestCtrl.IRequestCallback<Boolean>{
+                        override fun onSuccess(args: Boolean) {
+                            if (args){
+                                list[position].collect = false
+                                setImageResource(R.drawable.unlike_)
+                            }
+                        }
 
-                        if (it){
-                            list[position].collect = false
-                            setImageResource(R.drawable.unlike_)
+                        override fun onError(status: Int, msg: String) {
+
                         }
-                    }
+
+                    })
                 }else{
-                    RequestCtrl.requestCollect(data.id){
-                        if (it){
-                            list[position].collect = true
-                            setImageResource(R.drawable.like_)
+                    RequestCtrl.requestCollect(data.id,object:RequestCtrl.IRequestCallback<Boolean>{
+                        override fun onSuccess(args: Boolean) {
+                            if (args){
+                                list[position].collect = true
+                                setImageResource(R.drawable.like_)
+                            }
                         }
-                    }
+
+                        override fun onError(status: Int, msg: String) {
+
+                        }
+
+                    })
                 }
             }
         }

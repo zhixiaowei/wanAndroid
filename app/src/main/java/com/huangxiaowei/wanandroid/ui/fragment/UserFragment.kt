@@ -76,7 +76,17 @@ class UserFragment: BaseFragment(),View.OnClickListener{
                 fragmentCtrl.showFragment(TAG_USER_COLLECT)
             }
             R.id.logoutBtn->{
-                RequestCtrl.requestLogout {}//请求退出账户
+                //请求退出账户
+                RequestCtrl.requestLogout(object:RequestCtrl.IRequestCallback<Boolean>{
+                    override fun onSuccess(bean: Boolean) {
+
+                    }
+
+                    override fun onError(status: Int, msg: String) {
+
+                    }
+
+                })
             }
             R.id.todo->{
                 fragmentCtrl.showFragment(TAG_USER_TODO)

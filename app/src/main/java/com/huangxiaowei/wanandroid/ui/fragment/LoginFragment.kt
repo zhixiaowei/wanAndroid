@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
+import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.ui.BaseFragment
 import com.huangxiaowei.wanandroid.utils.SoftKeyboardUtils
@@ -30,11 +31,17 @@ class LoginFragment: BaseFragment(){
                 return@setOnClickListener
             }
 
-            RequestCtrl.requestLogin(userName,password){
-                it?.apply {
-                    showToast("$publicName 登录成功！")
+            RequestCtrl.requestLogin(userName,password,object:RequestCtrl.IRequestCallback<UserBean>{
+                override fun onSuccess(bean: UserBean) {
+                    it?.apply {
+                        showToast("${bean.publicName} 登录成功！")
+                    }
                 }
-            }
+
+                override fun onError(status: Int, msg: String) {
+
+                }
+            })
         }
     }
 }
