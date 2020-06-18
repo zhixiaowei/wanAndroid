@@ -13,14 +13,12 @@ import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerItem
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.ui.BaseFragment
-import com.huangxiaowei.wanandroid.ui.view.SuperListView
+import com.huangxiaowei.wanandroid.ui.view.BaseArticleFragment
 import com.youth.banner.Banner
 import com.youth.banner.indicator.CircleIndicator
-import com.youth.banner.util.BannerUtils.dp2px
 import kotlinx.android.synthetic.main.include_article_list.*
 
-class  HomeFragment: BaseFragment(){
+class  HomeFragment: BaseArticleFragment(){
 
     override fun getLayout(): Int {
         return R.layout.fragment_home
@@ -29,18 +27,12 @@ class  HomeFragment: BaseFragment(){
     private var articleAdapter: ArticleListAdapter?= null
     private lateinit var bannerView: Banner<*, *>
 
-    private var page = 0//文章列表分页
-
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
+        super.onCreated(view, savedInstanceState)
         initView()
 
-        showArticleList()
-        showBanner()
-    }
-
-    private fun showArticleList(){
-
         updateArticleList()
+        showBanner()
     }
 
     /**
@@ -75,13 +67,11 @@ class  HomeFragment: BaseFragment(){
            RequestCtrl.requestArticleList(page,object:RequestCtrl.IRequestCallback<ArticleListBean>{
                override fun onSuccess(bean: ArticleListBean) {
 
-                   articleRefresh.isRefreshing = false//停止显示刷新控件
-                   bottom_tip.visibility  = View.INVISIBLE
-                   this@HomeFragment.page = bean.curPage
+                   this@HomeFragment.articleCurPage = bean.curPage
 
                    if (articleAdapter == null){
                        articleAdapter = ArticleListAdapter(attackActivity,bean)
-                       articleList.adapter = articleAdapter
+                       initAdapter(articleAdapter!!)
                    }else if (bean.curPage == 0){
                        articleAdapter!!.apply {
                            clear()
@@ -101,14 +91,27 @@ class  HomeFragment: BaseFragment(){
                    }
 
                    showToast("加载完毕")
+
+                   onStopRequestUI()
                }
 
                override fun onError(status: Int, msg: String) {
-                   articleRefresh.isRefreshing = false//停止显示刷新控件
+
+                   if (articleCurPage == 0){
+                       articleAdapter?.apply {
+                           clear()
+                           notifyDataSetChanged()
+                       }
+                   }
+
+                   onRequestArticleError()
                }
 
            })
+    }
 
+    override fun onUpdateArticle(page: Int) {
+        updateArticleList(page)
     }
 
     override fun onStart() {
@@ -145,39 +148,5 @@ class  HomeFragment: BaseFragment(){
             }
         }
 
-        //文章列表滑动监听
-        articleList.setOnSlideListener(object:SuperListView.IOnSlideListener{
-            override fun onUp() {
-                //上滑时，可能是想回到顶部，显示悬浮窗
-                if (floating.visibility != View.VISIBLE){
-                    floating.visibility = View.VISIBLE
-                }
-            }
-
-            override fun onDown() {
-                //下滑，取消悬浮窗的显示
-                if (floating.visibility == View.VISIBLE){
-                    floating.visibility = View.INVISIBLE
-                }
-            }
-
-            override fun onTop() {}
-
-            override fun onBottom() {
-                bottom_tip.visibility = View.VISIBLE
-                updateArticleList(++page)//加载更多
-            }
-
-        })
-
-//        //悬浮窗，点击回到顶部
-        floating.setOnClickListener {
-            articleList.setSelection(0)
-        }
-
-        //顶部下拉刷新，更新显示最新文章
-        articleRefresh.setOnRefreshListener {
-            updateArticleList(0)
-        }
     }
 }

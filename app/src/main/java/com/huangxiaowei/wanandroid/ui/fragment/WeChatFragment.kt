@@ -1,9 +1,7 @@
 package com.huangxiaowei.wanandroid.ui.fragment
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import com.huangxiaowei.wanandroid.R
-import com.huangxiaowei.wanandroid.ui.BaseFragment
 import kotlinx.android.synthetic.main.fragment_chat.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.huangxiaowei.wanandroid.WebActivity
@@ -14,41 +12,29 @@ import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.weChatListBean.WeChatListBean
 import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListBean
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.ui.ConnectUtils
-import com.huangxiaowei.wanandroid.ui.view.SuperListView
-import kotlinx.android.synthetic.main.include_article_list.*
+import com.huangxiaowei.wanandroid.ui.view.BaseArticleFragment
 
 
-class WeChatFragment : BaseFragment(){
+class WeChatFragment : BaseArticleFragment(){
 
-
-    private var weChatId:Int = 0
-    private var articlePage:Int = 0
-    private var totalPage:Int = 0
-    private var articleListAdapter:WeChatArticleListAdapter?= null
+    private var weChatId:Int = 0//当前访问的公众号的作者的ID
+    private var articleListAdapter:WeChatArticleListAdapter?= null//公众号文章列表适配器
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
+        super.onCreated(view, savedInstanceState)
 
         val linearLayoutManager = LinearLayoutManager(attackActivity)
         linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
         weChatTitleList.layoutManager = linearLayoutManager
 
-        //顶部下拉刷新，更新显示最新文章
-        articleRefresh.setOnRefreshListener {
-            if (ConnectUtils.isNetworkConnected()){
-                requestArticleList(weChatId,0)
-            }else{
-                articleRefresh.isRefreshing = false//停止显示刷新控件
-                showToast("请检查网络是否正常！")
-            }
-        }
-
+        //请求获取公众号作者列表
         RequestCtrl.WeChat.requestWeChatList(object:RequestCtrl.IRequestCallback<WeChatListBean>{
             override fun onSuccess(bean: WeChatListBean) {
                 val adapter = WeChatTitleListAdapter(bean.data)
                 adapter.apply {
                     setOnClickListener(object:OnItemClickListener{
                         override fun onItemClick(v: View, position: Int): Boolean {
+                            //请求该公众号的文章
                             requestArticleList(getItem(position).id)
                             check(position)
                             return true
@@ -62,47 +48,23 @@ class WeChatFragment : BaseFragment(){
                     val id = bean.data[0].id
                     requestArticleList(id)
                 }
-
-                articleList.setOnSlideListener(object: SuperListView.IOnSlideListener{
-                    override fun onUp() {
-                        //上滑时，可能是想回到顶部，显示悬浮窗
-                        if (floating.visibility != View.VISIBLE){
-                            floating.visibility = View.VISIBLE
-                        }
-                    }
-
-                    override fun onDown() {
-                        //下滑，取消悬浮窗的显示
-                        if (floating.visibility == View.VISIBLE){
-                            floating.visibility = View.INVISIBLE
-                        }
-                    }
-
-                    override fun onTop() {}
-
-                    override fun onBottom() {
-                        bottom_tip.visibility = View.VISIBLE
-                        requestArticleList(weChatId,++articlePage)//加载更多
-                    }
-                })
             }
 
             override fun onError(status: Int, msg: String) {
-
+                onRequestArticleError()
             }
-
         })
     }
 
+    /**
+     * 请求[id]对应作者的公众号的历史记录第[page]页
+     */
     private fun requestArticleList(id:Int,page:Int = 0){
         RequestCtrl.WeChat.requestHistory(id,page,null,object:RequestCtrl.IRequestCallback<WeChatArticleListBean>{
             override fun onSuccess(bean: WeChatArticleListBean) {
 
-                articleRefresh.isRefreshing = false//停止显示顶部刷新控件
-                bottom_tip.visibility = View.INVISIBLE
                 weChatId = id
-                articlePage = bean.data.curPage
-                totalPage = bean.data.pageCount
+                articleCurPage = bean.data.curPage
 
                 if (bean.data.over){
                     showToast("再往下拉也没有啦！")
@@ -119,7 +81,8 @@ class WeChatFragment : BaseFragment(){
                             }
                         })
                     }
-                    articleList.adapter = articleListAdapter
+
+                    initAdapter(articleListAdapter!!)
                 }else{
                     if (bean.data.curPage == 0){
                         articleListAdapter?.run {
@@ -134,21 +97,25 @@ class WeChatFragment : BaseFragment(){
                         }
                     }
                 }
+
+                onStopRequestUI()
             }
 
             override fun onError(status: Int, msg: String) {
-                Log.i("http","onError")
-
-                bottom_tip.visibility = View.INVISIBLE
-                articleRefresh.isRefreshing = false//停止显示顶部刷新控件
                 if (page == 0){
                     articleListAdapter?.run {
                         clear()
                         notifyDataSetChanged()
                     }
                 }
+
+                onRequestArticleError()
             }
         })
+    }
+
+    override fun onUpdateArticle(page: Int) {
+        requestArticleList(weChatId,page)
     }
 
     override fun getLayout(): Int {

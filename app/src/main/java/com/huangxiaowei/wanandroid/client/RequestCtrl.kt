@@ -42,7 +42,7 @@ object RequestCtrl {
 
                         uiScope.launch { callback.onSuccess(bean) }//更新UI
                     }else{
-                        callback.onError()
+                        uiScope.launch { callback.onError() }
                         return
                     }
                 }
@@ -154,15 +154,17 @@ object RequestCtrl {
 
         httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
-                callback.onError()
+                uiScope.launch { callback.onError() }
             }
 
             override fun onSuccess(json: String) {
                 val reply = WanResponseAnalyst(json)
-                if (reply.isSuccess()){
-                    callback.onSuccess(true)
-                }else{
-                    callback.onError()
+                uiScope.launch {
+                    if (reply.isSuccess()){
+                        callback.onSuccess(true)
+                    }else{
+                        callback.onError()
+                    }
                 }
             }
         })
@@ -173,13 +175,15 @@ object RequestCtrl {
 
         httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
-                callback.onError()
+                uiScope.launch { callback.onError() }
             }
 
             override fun onSuccess(json: String) {
                 val reply = WanResponseAnalyst(json)
+                uiScope.launch {
+                    callback.onSuccess(reply.isSuccess())
+                }
 
-                callback.onSuccess(reply.isSuccess())
             }
         })
     }
@@ -207,7 +211,7 @@ object RequestCtrl {
                 override fun onError(e: Exception?, response: String) {
 
                     e?.printStackTrace()
-                    callback.onError()
+                    uiScope.launch { callback.onError() }
                 }
             })
         }

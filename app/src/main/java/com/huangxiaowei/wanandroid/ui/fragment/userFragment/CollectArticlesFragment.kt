@@ -8,13 +8,15 @@ import com.huangxiaowei.wanandroid.adaptor.CollectArticleListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
 import com.huangxiaowei.wanandroid.ui.BaseFragment
+import com.huangxiaowei.wanandroid.ui.view.BaseArticleFragment
 import kotlinx.android.synthetic.main.include_article_list.*
 
-class CollectArticlesFragment: BaseFragment() {
+class CollectArticlesFragment: BaseArticleFragment() {
 
     private var articleAdapter: CollectArticleListAdapter?= null
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
+        super.onCreated(view, savedInstanceState)
 
         articleList.setOnItemClickListener { parent, view, position, id ->
             articleAdapter?.apply {
@@ -40,10 +42,20 @@ class CollectArticlesFragment: BaseFragment() {
                 }else {
                     articleAdapter!!.addList(bean)
                 }
+
+                onStopRequestUI()
             }
 
             override fun onError(status: Int, msg: String) {
 
+                if (articleCurPage == 0){
+                    articleAdapter?.apply {
+                        clear()
+                        notifyDataSetChanged()
+                    }
+                }
+
+                onRequestArticleError()
             }
 
         })
@@ -51,5 +63,9 @@ class CollectArticlesFragment: BaseFragment() {
 
     override fun getLayout(): Int {
         return R.layout.fragment_user_collect
+    }
+
+    override fun onUpdateArticle(page: Int) {
+        updateCollectList(page)
     }
 }
