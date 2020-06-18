@@ -16,6 +16,7 @@ import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticle
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.globalStatus.ioScope
 import com.huangxiaowei.wanandroid.globalStatus.uiScope
+import com.huangxiaowei.wanandroid.showToast
 import kotlinx.coroutines.launch
 
 object RequestCtrl {
@@ -164,6 +165,7 @@ object RequestCtrl {
                         callback.onSuccess(true)
                     }else{
                         callback.onError()
+                        showToast("网络好像出小差啦~~")
                     }
                 }
             }
@@ -175,7 +177,10 @@ object RequestCtrl {
 
         httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
-                uiScope.launch { callback.onError() }
+                uiScope.launch {
+                    callback.onError()
+                    showToast("网络好像出小差啦~~")
+                }
             }
 
             override fun onSuccess(json: String) {
@@ -282,7 +287,7 @@ object RequestCtrl {
     /**
      * 获取搜索热词
      */
-    fun requeryHotKey(callback: IRequestCallback<HotKeyBean>?){
+    fun requestHotKey(callback: IRequestCallback<HotKeyBean>?){
         val url = "$baseUrl//hotkey/json"
         httpClient.doGet(url,object:HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {

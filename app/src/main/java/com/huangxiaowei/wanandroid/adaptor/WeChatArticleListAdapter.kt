@@ -8,6 +8,7 @@ import android.widget.TextView
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WechatArticleItem
+import com.huangxiaowei.wanandroid.showToast
 
 class WeChatArticleListAdapter(private val context: Context,val list:ArrayList<WechatArticleItem>)
     :CommonAdapter<WechatArticleItem>(context,list){

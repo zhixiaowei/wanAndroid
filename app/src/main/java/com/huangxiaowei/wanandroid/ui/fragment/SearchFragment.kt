@@ -17,15 +17,13 @@ import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
 import com.huangxiaowei.wanandroid.data.litepal.SearchHistoryBean
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.ui.BaseFragment
-import com.huangxiaowei.wanandroid.ui.view.SuperListView
+import com.huangxiaowei.wanandroid.ui.view.BaseArticleFragment
 import com.huangxiaowei.wanandroid.utils.SoftKeyboardUtils
-import com.huangxiaowei.wanandroid.utils.ViewUtils
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.include_article_list.*
 import org.litepal.LitePal
 
-class SearchFragment: BaseFragment(){
+class SearchFragment: BaseArticleFragment(){
 
     override fun getLayout(): Int {
         return R.layout.fragment_search
@@ -38,6 +36,8 @@ class SearchFragment: BaseFragment(){
     private var mPage = 0//当前页码
 
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
+        super.onCreated(view, savedInstanceState)
+
         search_btn.setOnClickListener {
             val text = search_tv.text.toString()
 
@@ -47,41 +47,12 @@ class SearchFragment: BaseFragment(){
             }
 
             search_tv.setSelection(text.length)
-            showToast("检索：$text")
-            articleRefresh.isRefreshing = true
             updateArticleList(0,text)
         }
 
         articleLayout.visibility = View.INVISIBLE
-        val v:View = layoutInflater.inflate(R.layout.list_empty,null)
-        ViewUtils.setEmptyView(articleList,v)
 
-        //文章列表滑动监听
-        articleList.setOnSlideListener(object: SuperListView.IOnSlideListener{
-            override fun onUp() {
-                //上滑时，可能是想回到顶部，显示悬浮窗
-                if (floating.visibility != View.VISIBLE){
-                    floating.visibility = View.VISIBLE
-                }
-            }
-
-            override fun onDown() {
-                //下滑，取消悬浮窗的显示
-                if (floating.visibility == View.VISIBLE){
-                    floating.visibility = View.INVISIBLE
-                }
-            }
-
-            override fun onTop() {}
-
-            override fun onBottom() {
-                    bottom_tip.visibility = View.VISIBLE
-                    updateArticleList(++mPage)//加载更多
-            }
-
-        })
-
-        RequestCtrl.requeryHotKey(object:RequestCtrl.IRequestCallback<HotKeyBean>{
+        RequestCtrl.requestHotKey(object:RequestCtrl.IRequestCallback<HotKeyBean>{
             override fun onSuccess(bean: HotKeyBean) {
                 for(item in bean.data){
 
@@ -199,18 +170,17 @@ class SearchFragment: BaseFragment(){
             historyAdapter!!.add(history)
         }
 
+        onStartRequestUI(page)
 
         RequestCtrl.requestSearch(searchText,page,object:RequestCtrl.IRequestCallback<ArticleListBean>{
             override fun onError(status: Int, msg: String) {
-                articleRefresh.isRefreshing = false
+                onRequestArticleError()
             }
 
             override fun onSuccess(bean: ArticleListBean) {
                 mPage = bean.curPage
-                bottom_tip.visibility = View.GONE
-                SoftKeyboardUtils.hideSoftKeyboard(attackActivity)
 
-                articleRefresh.isRefreshing = false
+                SoftKeyboardUtils.hideSoftKeyboard(attackActivity)
 
                 if (bean.curPage == 1||bean.curPage == 0){
 
@@ -221,7 +191,7 @@ class SearchFragment: BaseFragment(){
 
                 if (articleAdapter == null){
                     articleAdapter = ArticleListAdapter(attackActivity,bean)
-                    articleList.adapter = articleAdapter
+                    initAdapter(articleAdapter!!)
                 }else if (mPage == 0){
                     articleAdapter!!.apply {
                         clear()
@@ -230,12 +200,16 @@ class SearchFragment: BaseFragment(){
                 }else {
                     articleAdapter!!.addList(bean)
                 }
+
+                onStopRequestUI()
             }
         })
 
     }
 
-
+    override fun onUpdateArticle(page: Int) {
+        updateArticleList(page)
+    }
 
 
 

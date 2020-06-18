@@ -35,7 +35,7 @@ class HttpClient {
     private fun toPost(uri: String,data: Any,callback:OnIRequestResult?){
 
         if (!ConnectUtils.isNetworkConnected()){
-            showToast("网络连接不可用！")
+//            showToast("网络连接不可用！")
             callback?.onError(ConnectException(),"当前网络不可用")
             return
         }

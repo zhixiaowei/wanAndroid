@@ -67,9 +67,25 @@ abstract class BaseArticleFragment:BaseFragment() {
     fun onStopRequestUI(){
         articleRefresh.isRefreshing = false//停止显示顶部刷新控件
         bottom_tip.visibility = View.INVISIBLE
+
+//        if (adapter == null){
+//
+//        }
+
+        if (adapter?.isEmpty != false){
+            onEmptyListUI()
+        }
     }
 
-    open fun onEmptyListUI(){
+    fun onStartRequestUI(page:Int){
+        if (page == 0){
+            articleRefresh.isRefreshing = true
+        }else{
+            bottom_tip.visibility = View.VISIBLE
+        }
+    }
+
+    private fun onEmptyListUI(){
         val v:View = layoutInflater.inflate(R.layout.list_empty,null)
         ViewUtils.setEmptyView(articleList,v)
     }

@@ -29,11 +29,14 @@ class CollectArticlesFragment: BaseArticleFragment() {
     }
 
     private fun updateCollectList(page:Int = 0){
+
+        onStartRequestUI(page)
+
         RequestCtrl.requestCollectArticles(page,object:RequestCtrl.IRequestCallback<CollectArticleListBean>{
             override fun onSuccess(bean: CollectArticleListBean) {
                 if (articleAdapter == null){
                     articleAdapter = CollectArticleListAdapter(attackActivity,bean)
-                    articleList.adapter = articleAdapter
+                    initAdapter(articleAdapter!!)
                 }else if (bean.curPage == 0){
                     articleAdapter!!.apply {
                         clear()

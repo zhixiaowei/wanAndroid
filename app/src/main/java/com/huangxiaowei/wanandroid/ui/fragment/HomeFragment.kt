@@ -64,6 +64,8 @@ class  HomeFragment: BaseArticleFragment(){
      */
     private fun updateArticleList(page:Int = 0) {
 
+           onStartRequestUI(page)
+
            RequestCtrl.requestArticleList(page,object:RequestCtrl.IRequestCallback<ArticleListBean>{
                override fun onSuccess(bean: ArticleListBean) {
 
