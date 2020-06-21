@@ -15,9 +15,6 @@ class SuperCookie: CookieJar{
     override fun loadForRequest(url: HttpUrl): List<Cookie> {
         val cookies = cookieStore.getCookie(url)
 
-        for (c in cookies){
-            Logger.i("key:${c.name}:value:${c.value}")
-        }
         return cookies ?: ArrayList()
     }
 

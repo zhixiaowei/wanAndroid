@@ -21,10 +21,14 @@ class FragmentCtrl{
     private lateinit var fragmentManager: FragmentManager
     private lateinit var list:ArrayMap<String, BaseFragment>
 
+    private val TYPE_HIDE = 0//隐藏前一个
+    private val TYPE_FINISH = 1//销毁前一个(replace)
+
     private val stackList = ArrayList<String>()//Fragment栈管理
 
     private val executor = object:
         BaseFragment.OnFragmentRequestCallback {
+
         override fun onStartFragment(tag: String) {
             Logger.i("试图启动：$tag", LOG_TAG)
             showFragment(tag)
@@ -88,7 +92,7 @@ class FragmentCtrl{
         }
     }
 
-    fun showFragment(tag: String) {
+    fun showFragment(tag: String,type:Int = TYPE_HIDE) {
 
         if (tag == currentFragment?.tag){
             //不重复显示当前Fragment
@@ -106,11 +110,9 @@ class FragmentCtrl{
             }
 
             if (currentFragment == null){
-                //onCreate()
                 fragmentManager.beginTransaction()
                     .add(R.id.fragmentContainer,temp, tag)
                     .commit()
-
             }else{
                 fragmentManager.beginTransaction()
                     .hide(currentFragment!!)

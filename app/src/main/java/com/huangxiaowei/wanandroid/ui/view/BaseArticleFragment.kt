@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.BaseAdapter
 import androidx.core.view.isEmpty
+import com.bumptech.glide.Glide
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.ui.BaseFragment
 import com.huangxiaowei.wanandroid.ui.ConnectUtils
@@ -67,10 +68,6 @@ abstract class BaseArticleFragment:BaseFragment() {
     fun onStopRequestUI(){
         articleRefresh.isRefreshing = false//停止显示顶部刷新控件
         bottom_tip.visibility = View.INVISIBLE
-
-//        if (adapter == null){
-//
-//        }
 
         if (adapter?.isEmpty != false){
             onEmptyListUI()

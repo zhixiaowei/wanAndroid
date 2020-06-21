@@ -1,7 +1,8 @@
 package com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean
+import org.litepal.crud.LitePalSupport
 
 data class TodoBean(
-    var completeDate: Any?= null,
+//    var completeDate: Any?= null,
     var completeDateStr: String = "",
     var content: String = "",
     var date: Long = 0L,
@@ -12,4 +13,4 @@ data class TodoBean(
     var title: String = "",
     var type: Int = 0,
     var userId: Int = 0
-)
+):LitePalSupport()
