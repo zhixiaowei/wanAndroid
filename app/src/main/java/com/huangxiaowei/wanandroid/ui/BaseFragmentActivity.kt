@@ -2,7 +2,6 @@ package com.huangxiaowei.wanandroid.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.huangxiaowei.wanandroid.MainActivity
 import com.huangxiaowei.wanandroid.ui.fragment.FragmentCtrl
 
 abstract class BaseFragmentActivity: AppCompatActivity(){
@@ -13,7 +12,7 @@ abstract class BaseFragmentActivity: AppCompatActivity(){
     /**
      * 获取布局文件ID
      */
-    abstract fun getLayoutID():Int
+     abstract fun getLayoutID():Int
 
     /**
      * 获取所有Fragment的实例的ArrayMap，以及设置默认显示的Fragment
@@ -44,20 +43,18 @@ abstract class BaseFragmentActivity: AppCompatActivity(){
         fragmentCtrl.showFragment(tag)
     }
 
+    fun getCurrentFragment():BaseFragment?{
+        return fragmentCtrl.getCurrentFragment()
+    }
+
     override fun onBackPressed() {
         //如果未消耗该事件，那么不执行默认
         if (!fragmentCtrl.onBackPressed()){
             return if (fragmentCtrl.getCurrentFragment()?.tag == config.mainFragment){
                 super.onBackPressed()
             }else{
-                //仅当当前显示，且显示的不为用户信息主页面时消化该事件，回到用户主页
-                fragmentCtrl.showFragment(MainActivity.TAG_HOME)
+                fragmentCtrl.showFragment(config.mainFragment)
             }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        fragmentCtrl.onSaveInstanceState(outState)
-        super.onSaveInstanceState(outState)
     }
 }

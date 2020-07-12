@@ -1,5 +1,7 @@
 package com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean
 
+import com.huangxiaowei.wanandroid.data.litepal.TodoBean
+
 data class QueryTodoBean(
     val curPage: Int,
     val datas: List<TodoBean>? = mutableListOf(),

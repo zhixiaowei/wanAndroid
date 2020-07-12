@@ -10,7 +10,6 @@ import com.huangxiaowei.wanandroid.data.bean.coinCount.coinCountDetailsBean.Coin
 import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
-import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
 import com.huangxiaowei.wanandroid.data.bean.weChatListBean.WeChatListBean
 import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListBean
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager

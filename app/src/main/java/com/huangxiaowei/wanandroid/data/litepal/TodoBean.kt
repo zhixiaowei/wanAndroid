@@ -1,4 +1,4 @@
-package com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean
+package com.huangxiaowei.wanandroid.data.litepal
 import org.litepal.crud.LitePalSupport
 
 data class TodoBean(

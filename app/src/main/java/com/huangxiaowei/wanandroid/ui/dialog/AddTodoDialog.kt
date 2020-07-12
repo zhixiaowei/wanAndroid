@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import com.huangxiaowei.wanandroid.R
-import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
+import com.huangxiaowei.wanandroid.data.litepal.TodoBean
 import com.huangxiaowei.wanandroid.showToast
 import kotlinx.android.synthetic.main.dialog_add_todo.*
 import java.util.*
@@ -76,7 +76,7 @@ class AddTodoDialog(private val callback: IDialogClickCallback?):DialogFragment(
     }
 
     interface IDialogClickCallback{
-        fun onConfirm(dialog: AddTodoDialog, todo:TodoBean)
+        fun onConfirm(dialog: AddTodoDialog, todo: TodoBean)
         fun onCancel()
     }
 

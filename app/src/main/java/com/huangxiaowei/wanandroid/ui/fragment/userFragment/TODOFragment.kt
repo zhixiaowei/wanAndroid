@@ -4,31 +4,28 @@ import android.os.Bundle
 import android.util.ArrayMap
 import android.view.View
 import com.huangxiaowei.wanandroid.R
-import com.huangxiaowei.wanandroid.adaptor.OnItemClickListener
-import com.huangxiaowei.wanandroid.adaptor.TodoListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.client.RequestCtrl.TODO
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
+import com.huangxiaowei.wanandroid.data.litepal.TodoBean
 import com.huangxiaowei.wanandroid.ui.BaseFragment
 import com.huangxiaowei.wanandroid.ui.BaseMainFragment
 import com.huangxiaowei.wanandroid.ui.dialog.AddTodoDialog
 import com.huangxiaowei.wanandroid.ui.fragment.FragmentCtrl
-import com.huangxiaowei.wanandroid.ui.fragment.LoginFragment
-import com.huangxiaowei.wanandroid.ui.fragment.UserFragment
 import com.huangxiaowei.wanandroid.ui.fragment.userFragment.todoFragment.DoTodoFragment
 import com.huangxiaowei.wanandroid.ui.fragment.userFragment.todoFragment.FinishTodoFragment
 import kotlinx.android.synthetic.main.fragment_user_todo.*
+import org.litepal.extension.saveAll
 
 class TODOFragment :BaseMainFragment(),View.OnClickListener{
     override fun onClick(v: View) {
        when(v.id){
            R.id.todoView ->{
-               startFragment(TAG_TODO_DO)
+               showFragment(TAG_TODO_DO)
            }
            R.id.finishView->{
-                startFragment(TAG_TODO_FINISH)
+               showFragment(TAG_TODO_FINISH)
            }
            R.id.addTodoBtn->{
                AddTodoDialog(object :
@@ -62,6 +59,8 @@ class TODOFragment :BaseMainFragment(),View.OnClickListener{
         todoView.setOnClickListener(this)
         finishView.setOnClickListener(this)
         addTodoBtn.setOnClickListener(this)
+
+        loadList(-1)
     }
 
     override fun getLayout(): Int {
@@ -71,9 +70,6 @@ class TODOFragment :BaseMainFragment(),View.OnClickListener{
     companion object{
         const val TAG_TODO_DO = "TAG_TODO_DO"
         const val TAG_TODO_FINISH = "TAG_TODO_FINISH"
-
-        private const val CURRENT_DO_LIST = 0 //未完成的TODO
-        private const val CURRENT_FINISH_LIST = 1 //已完成的TODO
     }
 
     override fun getFragmentConfig(): FragmentCtrl.FragmentConfig {
@@ -84,7 +80,23 @@ class TODOFragment :BaseMainFragment(),View.OnClickListener{
 
         return FragmentCtrl.ConfigBuilder()
             .addList(list)
-            .mainFragment(UserFragment.TAG_USER_MAIN)
+            .mainFragment(TAG_TODO_DO)
             .build()
+    }
+
+    private fun loadList(status:Int){
+
+        TODO.query(0,TODO.ORDER_CREATE_DATE_POSITIVE,status,null,null,object:RequestCtrl.IRequestCallback<QueryTodoBean>{
+            override fun onSuccess(bean: QueryTodoBean) {
+
+                bean.datas?.apply {
+                    this.saveAll()
+                }
+            }
+
+            override fun onError(status: Int, msg: String) {
+
+            }
+        })
     }
 }

@@ -6,10 +6,8 @@ import com.huangxiaowei.wanandroid.utils.Logger
 
 abstract class BaseMainFragment:BaseFragment(){
 
-    private val fragmentCtrl =
-        FragmentCtrl()//fragment的显示及隐藏，重建的管理类
+    private val fragmentCtrl = FragmentCtrl()//fragment的显示及隐藏，重建的管理类
     private lateinit var config: FragmentCtrl.FragmentConfig
-
 
     abstract override fun getLayout(): Int
     abstract fun getFragmentConfig():FragmentCtrl.FragmentConfig
@@ -36,12 +34,6 @@ abstract class BaseMainFragment:BaseFragment(){
         }
 
         return true
-    }
-
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        fragmentCtrl.onSaveInstanceState(outState)
-        super.onSaveInstanceState(outState)
     }
 
 }

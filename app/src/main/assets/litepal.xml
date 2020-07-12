@@ -2,10 +2,11 @@
 <litepal>
     <dbname value="wanandroid" />
 
-    <version value="1" />
+    <version value="2" />
 
     <list>
         <mapping class="com.huangxiaowei.wanandroid.data.litepal.SearchHistoryBean" />
+        <mapping class="com.huangxiaowei.wanandroid.data.litepal.TodoBean"/>
     </list>
 
 </litepal>

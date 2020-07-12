@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
-import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.TodoBean
+import com.huangxiaowei.wanandroid.data.litepal.TodoBean
 import com.huangxiaowei.wanandroid.ui.view.SlideLayout
 
 class TodoListAdapter(private val context: Context,private val list:ArrayList<TodoBean>):BaseAdapter() {
@@ -66,7 +66,7 @@ class TodoListAdapter(private val context: Context,private val list:ArrayList<To
         notifyDataSetChanged()
     }
 
-    fun remove(data:TodoBean){
+    fun remove(data: TodoBean){
         list.remove(data)
 
         notifyDataSetChanged()

@@ -52,7 +52,7 @@ abstract class BaseFragment:Fragment(){
     }
 
     /**
-     * 隐藏当前Fragment，并移除队列，显示上一个Fragment
+     * replace当前Fragment，并移除队列，显示上一个Fragment
      * 类似于Activity的finish()
      */
     fun finish(){
