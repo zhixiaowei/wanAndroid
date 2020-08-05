@@ -1,6 +1,10 @@
 package com.huangxiaowei.wanandroid.client
+
+import android.annotation.SuppressLint
 import android.util.ArrayMap
 import com.alibaba.fastjson.JSON
+import com.huangxiaowei.baselib.net.http.HttpClient
+import com.huangxiaowei.wanandroid.App
 import com.huangxiaowei.wanandroid.data.WanResponseAnalyst
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
@@ -17,10 +21,27 @@ import com.huangxiaowei.wanandroid.globalStatus.ioScope
 import com.huangxiaowei.wanandroid.globalStatus.uiScope
 import com.huangxiaowei.wanandroid.showToast
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 object RequestCtrl {
 
-    private val httpClient = HttpClient()
+    @SuppressLint("StaticFieldLeak")
+    private val interceptor = HttpClient.HttpClientConfig.InterceptorConfigBuilder(App.context)
+        .isOpenNetCache(true)
+        .setNetCacheValiditySeconds(5)
+        //联网状态下如果5秒内访问同一链接，则使用缓存
+        .isOpenOfficeCache(true)
+        .setOfficeCacheValiditySeconds(TimeUnit.DAYS.toSeconds(14))
+        //断网情况下，如果14天内访问过同一链接，则采用上次的缓存
+//        .ignoreUrlOfficeCache(listOf("https://www.wanandroid.com//hotkey/json"))
+
+        .build()
+
+    @SuppressLint("StaticFieldLeak")
+    private val httpClient = HttpClient.HttpClientBuilder(App.context)
+        .setInterceptorCacheConfig(interceptor)
+        .isKeepCookies(true)//对Cookies进行持久化处理及更新，并在请求时携带
+        .build()
 
     private const val baseUrl = "https://www.wanandroid.com"
 
@@ -32,7 +53,7 @@ object RequestCtrl {
     fun requestArticleList(requestPage:Int = 0,callback: IRequestCallback<ArticleListBean>){
 
         ioScope.launch {
-            httpClient.doGet("${baseUrl}/article/list/${requestPage}/json",object:HttpClient.OnIRequestResult{
+            httpClient.doGet("${baseUrl}/article/list/${requestPage}/json",object: HttpClient.OnIRequestResult{
 
                 override fun onSuccess(json: String) {
                     val response = WanResponseAnalyst(json)
@@ -62,7 +83,7 @@ object RequestCtrl {
     fun requestBanner(callback: IRequestCallback<BannerBean>){
 
         ioScope.launch {
-            httpClient.doGet("$baseUrl/banner/json",object:HttpClient.OnIRequestResult{
+            httpClient.doGet("$baseUrl/banner/json",object: HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
 
                     val reply = WanResponseAnalyst(json)
@@ -95,7 +116,7 @@ object RequestCtrl {
             form["username"] = userName
             form["password"] = password
 
-            httpClient.doPost("$baseUrl/user/login",form,object:HttpClient.OnIRequestResult{
+            httpClient.doPost("$baseUrl/user/login",form,object: HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
                     val response = WanResponseAnalyst(json)
 
@@ -108,7 +129,10 @@ object RequestCtrl {
 
                         LoginStateManager.login(data,bean)
                     } else {
-                        uiScope.launch { callback.onError() }
+                        uiScope.launch {
+                            showToast(response.getErrorMsg())
+                            callback.onError(response.getResultCode(),response.getErrorMsg())
+                        }
                     }
                 }
 
@@ -125,7 +149,7 @@ object RequestCtrl {
     fun requestLogout(callback: IRequestCallback<Boolean>){
 
         ioScope.launch {
-            httpClient.doGet("https://www.wanandroid.com/user/logout/json",object:HttpClient.OnIRequestResult{
+            httpClient.doGet("https://www.wanandroid.com/user/logout/json",object: HttpClient.OnIRequestResult{
                 override fun onError(e: Exception?, response: String) {
                     uiScope.launch {
                         callback.onError()
@@ -152,7 +176,7 @@ object RequestCtrl {
     fun requestCollect(id:Int,callback: IRequestCallback<Boolean>){
         val url = "$baseUrl/lg/collect/$id/json"
 
-        httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
+        httpClient.doPost(url, ArrayMap(),object: HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
                 uiScope.launch { callback.onError() }
             }
@@ -174,7 +198,7 @@ object RequestCtrl {
     fun requestUNCollect(id:Int,callback: IRequestCallback<Boolean>){
         val url = "https://www.wanandroid.com/lg/uncollect_originId/$id/json"
 
-        httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
+        httpClient.doPost(url, ArrayMap(),object: HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
                 uiScope.launch {
                     callback.onError()
@@ -197,7 +221,7 @@ object RequestCtrl {
      */
     fun requestCollectArticles(page:Int, callback: IRequestCallback<CollectArticleListBean>){
         ioScope.launch {
-            httpClient.doGet("$baseUrl/lg/collect/list/$page/json",object:HttpClient.OnIRequestResult{
+            httpClient.doGet("$baseUrl/lg/collect/list/$page/json",object: HttpClient.OnIRequestResult{
                 override fun onSuccess(json: String) {
                     val reply = WanResponseAnalyst(json)
 
@@ -227,7 +251,7 @@ object RequestCtrl {
     fun requestCoinCount(callback: IRequestCallback<CoinCountBean>){
         val url = "$baseUrl/lg/coin/userinfo/json"
 
-        httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+        httpClient.doGet(url,object: HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
 
                 e?.printStackTrace()
@@ -256,7 +280,7 @@ object RequestCtrl {
 
         val form = ArrayMap<String,String>()
         form["k"] = msg
-        httpClient.doPost(url,form,object :HttpClient.OnIRequestResult{
+        httpClient.doPost(url,form,object : HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
                 uiScope.launch { callback.onError() }
             }
@@ -288,7 +312,7 @@ object RequestCtrl {
      */
     fun requestHotKey(callback: IRequestCallback<HotKeyBean>?){
         val url = "$baseUrl//hotkey/json"
-        httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+        httpClient.doGet(url,object: HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
                 uiScope.launch { callback?.onError() }
             }
@@ -315,7 +339,7 @@ object RequestCtrl {
      */
     fun requestCoinCountDetails(callback: IRequestCallback<CoinCountDetailsBean>){
         val url = "$baseUrl//lg/coin/list/1/json"
-        httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+        httpClient.doGet(url,object: HttpClient.OnIRequestResult{
             override fun onError(e: Exception?, response: String) {
                 uiScope.launch { callback.onError() }
             }
@@ -341,7 +365,7 @@ object RequestCtrl {
          */
         fun requestWeChatList(callback: IRequestCallback<WeChatListBean>?){
             val url = "$baseUrl/wxarticle/chapters/json"
-            httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+            httpClient.doGet(url,object: HttpClient.OnIRequestResult{
                 override fun onError(e: Exception?, response: String) {
                     uiScope.launch { callback?.onError() }
                 }
@@ -369,7 +393,7 @@ object RequestCtrl {
                 ""
             }
 
-            httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+            httpClient.doGet(url,object: HttpClient.OnIRequestResult{
                 override fun onError(e: Exception?, response: String) {
                     uiScope.launch { callback.onError() }
                 }
@@ -418,7 +442,7 @@ object RequestCtrl {
             from["type"] = type.toString()
             from["priority"] = priority.toString()
 
-            httpClient.doPost(url,from,object:HttpClient.OnIRequestResult{
+            httpClient.doPost(url,from,object: HttpClient.OnIRequestResult{
                 override fun onError(e: Exception?, response: String) {
                     uiScope.launch { callback.onError() }
                 }
@@ -454,7 +478,7 @@ object RequestCtrl {
                     if (type!=null){"&type=$type"}else{""}+
                     if (priority!=null){"&priority=$priority"}else{""}
 
-            httpClient.doGet(url,object:HttpClient.OnIRequestResult{
+            httpClient.doGet(url,object: HttpClient.OnIRequestResult{
                 override fun onError(e: Exception?, response: String) {
                     uiScope.launch { callback.onError() }
                 }
@@ -477,7 +501,7 @@ object RequestCtrl {
 
         fun delete(id:Int,callback: IRequestCallback<Boolean>){
             val url = "$baseUrl/lg/todo/delete/$id/json"
-            httpClient.doPost(url, ArrayMap(),object:HttpClient.OnIRequestResult{
+            httpClient.doPost(url, ArrayMap(),object: HttpClient.OnIRequestResult{
                 override fun onError(e: Exception?, response: String) {
                     uiScope.launch { callback.onError() }
                 }
@@ -514,7 +538,7 @@ object RequestCtrl {
             from["priority"] = priority.toString()
 
 
-            httpClient.doPost(url,from,object:HttpClient.OnIRequestResult{
+            httpClient.doPost(url,from,object: HttpClient.OnIRequestResult{
                 override fun onError(e: Exception?, response: String) {
                     uiScope.launch { callback.onError() }
                 }

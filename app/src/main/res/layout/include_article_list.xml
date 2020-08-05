@@ -32,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
-        <com.huangxiaowei.wanandroid.ui.view.SuperListView
+        <com.huangxiaowei.baselib.ui.view.SuperListView
             android:id="@+id/articleList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

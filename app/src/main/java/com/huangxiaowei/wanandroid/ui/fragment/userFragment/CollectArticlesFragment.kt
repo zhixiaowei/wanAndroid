@@ -7,8 +7,7 @@ import com.huangxiaowei.wanandroid.WebActivity
 import com.huangxiaowei.wanandroid.adaptor.CollectArticleListAdapter
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.collectArticleListBean.CollectArticleListBean
-import com.huangxiaowei.wanandroid.ui.BaseFragment
-import com.huangxiaowei.wanandroid.ui.view.BaseArticleFragment
+import com.huangxiaowei.wanandroid.ui.fragment.BaseArticleFragment
 import kotlinx.android.synthetic.main.include_article_list.*
 
 class CollectArticlesFragment: BaseArticleFragment() {

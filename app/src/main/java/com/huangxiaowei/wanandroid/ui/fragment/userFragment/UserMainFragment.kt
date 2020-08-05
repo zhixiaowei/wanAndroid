@@ -1,20 +1,17 @@
 package com.huangxiaowei.wanandroid.ui.fragment.userFragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import com.huangxiaowei.baselib.ui.fragment.BaseFragment
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.data.bean.coinCount.CoinCountBean
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
-import com.huangxiaowei.wanandroid.ui.BaseFragment
-import com.huangxiaowei.wanandroid.ui.fragment.UserFragment
-import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_user_main.*
 
-class UserMainFragment(private val onAgentClickListener: View.OnClickListener):BaseFragment(),IOnLoginCallback {
+class UserMainFragment(private val onAgentClickListener: View.OnClickListener): BaseFragment(),IOnLoginCallback {
 
     override fun onLogin(user: UserBean) {
         userName.text = user.nickname
@@ -23,7 +20,9 @@ class UserMainFragment(private val onAgentClickListener: View.OnClickListener):B
         RequestCtrl.requestCoinCount(object:RequestCtrl.IRequestCallback<CoinCountBean>{
             override fun onSuccess(bean: CoinCountBean) {
                 bean.apply {
-                    this@UserMainFragment.coinCount.text = coinCount.toString()
+                    if (isVisible){
+                        this@UserMainFragment.coinCount.text = coinCount.toString()
+                    }
                 }
             }
 

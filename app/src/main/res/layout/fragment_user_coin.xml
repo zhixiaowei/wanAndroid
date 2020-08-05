@@ -11,7 +11,7 @@
         android:gravity="center"
         android:textSize="@dimen/qb_px_20"/>
 
-    <com.huangxiaowei.wanandroid.ui.view.SuperListView
+    <com.huangxiaowei.baselib.ui.view.SuperListView
         android:id="@+id/coinList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

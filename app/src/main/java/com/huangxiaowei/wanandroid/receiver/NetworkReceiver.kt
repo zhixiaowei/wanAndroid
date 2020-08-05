@@ -6,7 +6,8 @@ import android.content.Context.CONNECTIVITY_SERVICE
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.widget.Toast
-import com.huangxiaowei.wanandroid.ui.ConnectUtils
+import com.huangxiaowei.baselib.utils.ConnectUtils
+import com.huangxiaowei.wanandroid.App
 
 
 @Suppress("DEPRECATION")
@@ -35,7 +36,7 @@ class NetworkReceiver : BroadcastReceiver() {
 
     companion object {
 
-        var isNetworkAvailable = ConnectUtils.isNetworkConnected()
+        var isNetworkAvailable = ConnectUtils.isNetworkConnected(App.context)
         private var callback: INetworkStatusCallback? = null
 
         fun setINetworkStatusCallback(isSticky:Boolean,callback: INetworkStatusCallback) {

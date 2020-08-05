@@ -3,28 +3,39 @@ package com.huangxiaowei.wanandroid.ui.fragment.userFragment
 import android.os.Bundle
 import android.util.ArrayMap
 import android.view.View
+import com.huangxiaowei.baselib.ui.fragment.BaseFragment
+import com.huangxiaowei.baselib.ui.fragment.BaseMainFragment
+import com.huangxiaowei.baselib.ui.fragment.FragmentCtrl
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.client.RequestCtrl.TODO
 import com.huangxiaowei.wanandroid.data.bean.todo.queryToDoBean.QueryTodoBean
 import com.huangxiaowei.wanandroid.showToast
 import com.huangxiaowei.wanandroid.data.litepal.TodoBean
-import com.huangxiaowei.wanandroid.ui.BaseFragment
-import com.huangxiaowei.wanandroid.ui.BaseMainFragment
 import com.huangxiaowei.wanandroid.ui.dialog.AddTodoDialog
-import com.huangxiaowei.wanandroid.ui.fragment.FragmentCtrl
 import com.huangxiaowei.wanandroid.ui.fragment.userFragment.todoFragment.DoTodoFragment
 import com.huangxiaowei.wanandroid.ui.fragment.userFragment.todoFragment.FinishTodoFragment
+import kotlinx.android.synthetic.main.fragment_user_main.*
 import kotlinx.android.synthetic.main.fragment_user_todo.*
+import org.litepal.LitePal
+import org.litepal.crud.LitePalSupport
 import org.litepal.extension.saveAll
 
-class TODOFragment :BaseMainFragment(),View.OnClickListener{
+class TODOFragment : BaseMainFragment(),View.OnClickListener{
+
+    private val todoFragment = DoTodoFragment()
+    private val finishFragment = FinishTodoFragment()
+
     override fun onClick(v: View) {
        when(v.id){
            R.id.todoView ->{
+               todoView.setImageResource(R.drawable.todo_doing)
+               finishView.setImageResource(R.drawable.todo_finish_grep)
                showFragment(TAG_TODO_DO)
            }
            R.id.finishView->{
+               todoView.setImageResource(R.drawable.todo_doing_grep)
+               finishView.setImageResource(R.drawable.todo_finish)
                showFragment(TAG_TODO_FINISH)
            }
            R.id.addTodoBtn->{
@@ -50,7 +61,7 @@ class TODOFragment :BaseMainFragment(),View.OnClickListener{
                    }
 
                    override fun onCancel() {}
-               })
+               }).show(fragmentManager!!,"ADD")
            }
        }
     }
@@ -79,8 +90,7 @@ class TODOFragment :BaseMainFragment(),View.OnClickListener{
         list[TAG_TODO_FINISH] = FinishTodoFragment()
 
         return FragmentCtrl.ConfigBuilder()
-            .addList(list)
-            .mainFragment(TAG_TODO_DO)
+            .init(R.id.fragmentContainer,list, TAG_TODO_DO)
             .build()
     }
 
@@ -88,10 +98,10 @@ class TODOFragment :BaseMainFragment(),View.OnClickListener{
 
         TODO.query(0,TODO.ORDER_CREATE_DATE_POSITIVE,status,null,null,object:RequestCtrl.IRequestCallback<QueryTodoBean>{
             override fun onSuccess(bean: QueryTodoBean) {
+                LitePal.deleteAll(TodoBean::class.java,"")//清空本地缓存
+                bean.datas?.saveAll()
 
-                bean.datas?.apply {
-                    this.saveAll()
-                }
+                todoFragment.updateList()
             }
 
             override fun onError(status: Int, msg: String) {
@@ -99,4 +109,10 @@ class TODOFragment :BaseMainFragment(),View.OnClickListener{
             }
         })
     }
+
+    override fun onBackPressed(): Boolean {
+        finish()
+        return true
+    }
+
 }

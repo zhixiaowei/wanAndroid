@@ -9,7 +9,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
-import com.huangxiaowei.wanandroid.utils.Logger
+import androidx.multidex.MultiDex
+import com.huangxiaowei.baselib.maintain.Logger
 import com.simple.spiderman.SpiderMan
 import org.litepal.LitePal
 import org.litepal.tablemanager.Connector
@@ -29,12 +30,14 @@ class App:Application(){
     override fun onCreate() {
         super.onCreate()
         context = this
-
+        MultiDex.install(this)
         SpiderMan.init(this)
         LitePal.initialize(context)
-//        MultiDex.install(this)
+
         val db = Connector.getDatabase()
         Logger.i("db path:${db.path}")
+
+
         this.registerActivityLifecycleCallbacks(object: ActivityLifecycleCallbacks{
             override fun onActivityPaused(activity: Activity) {
 

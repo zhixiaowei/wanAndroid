@@ -2,8 +2,9 @@ package com.huangxiaowei.wanandroid.ui.fragment
 import android.os.Bundle
 import android.view.View
 import com.huangxiaowei.wanandroid.R
-import kotlinx.android.synthetic.main.fragment_chat.*
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.huangxiaowei.baselib.expand.setLinearLayout
 import com.huangxiaowei.wanandroid.WebActivity
 import com.huangxiaowei.wanandroid.adaptor.OnItemClickListener
 import com.huangxiaowei.wanandroid.adaptor.WeChatArticleListAdapter
@@ -12,7 +13,7 @@ import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.data.bean.weChatListBean.WeChatListBean
 import com.huangxiaowei.wanandroid.data.bean.wechatArticleListBean.WeChatArticleListBean
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.ui.view.BaseArticleFragment
+import kotlinx.android.synthetic.main.fragment_chat.*
 
 
 class WeChatFragment : BaseArticleFragment(){
@@ -23,9 +24,7 @@ class WeChatFragment : BaseArticleFragment(){
     override fun onCreated(view: View, savedInstanceState: Bundle?) {
         super.onCreated(view, savedInstanceState)
 
-        val linearLayoutManager = LinearLayoutManager(attackActivity)
-        linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
-        weChatTitleList.layoutManager = linearLayoutManager
+        weChatTitleList.setLinearLayout(attackActivity,RecyclerView.HORIZONTAL)
 
         //请求获取公众号作者列表
         RequestCtrl.WeChat.requestWeChatList(object:RequestCtrl.IRequestCallback<WeChatListBean>{

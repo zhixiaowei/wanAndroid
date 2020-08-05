@@ -1,4 +1,5 @@
 package com.huangxiaowei.wanandroid.data.litepal
+import com.alibaba.fastjson.annotation.JSONField
 import org.litepal.crud.LitePalSupport
 
 data class TodoBean(
@@ -7,7 +8,8 @@ data class TodoBean(
     var content: String = "",
     var date: Long = 0L,
     var dateStr: String = "",
-    var id: Int = -1,
+
+    @JSONField(name = "id") var todoId: Int = -1,
     var priority: Int = 0,
     var status: Int = 0,
     var title: String = "",

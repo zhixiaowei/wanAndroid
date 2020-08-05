@@ -5,11 +5,14 @@ import android.os.Bundle
 import android.util.ArrayMap
 import android.view.View
 import android.widget.Button
+import com.huangxiaowei.baselib.maintain.Logger
+import com.huangxiaowei.baselib.ui.fragment.BaseFragment
+import com.huangxiaowei.baselib.ui.fragment.BaseFragmentActivity
+import com.huangxiaowei.baselib.ui.fragment.FragmentCtrl
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.data.bean.UserBean
 import com.huangxiaowei.wanandroid.listener.IOnLoginCallback
 import com.huangxiaowei.wanandroid.receiver.NetworkReceiver
-import com.huangxiaowei.wanandroid.ui.*
 import com.huangxiaowei.wanandroid.ui.fragment.*
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -28,7 +31,7 @@ class MainActivity : BaseFragmentActivity(),View.OnClickListener,IOnLoginCallbac
     override fun getLayoutID() = R.layout.activity_main
 
     override fun getFragmentConfig(): FragmentCtrl.FragmentConfig {
-        val map = ArrayMap<String,BaseFragment>()
+        val map = ArrayMap<String, BaseFragment>()
         map[TAG_HOME] = HomeFragment()
         map[TAG_WE_CHAT] = WeChatFragment()
         map[TAG_USER] = UserFragment()
@@ -36,8 +39,7 @@ class MainActivity : BaseFragmentActivity(),View.OnClickListener,IOnLoginCallbac
         map[TAG_SEARCH] = SearchFragment()
 
         return FragmentCtrl.ConfigBuilder()
-                    .addList(map)
-                    .mainFragment(TAG_HOME)
+                    .init(R.id.fragmentContainer,map, TAG_HOME)
                     .build()
     }
 
@@ -63,6 +65,16 @@ class MainActivity : BaseFragmentActivity(),View.OnClickListener,IOnLoginCallbac
                 networkTip.visibility = if (isAvailable){View.GONE}else{View.VISIBLE}
             }
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        showToast("onDestroy")
+    }
+
+    override fun onBackPressed() {
+        Logger.i("onBackPressed2","activity")
+        super.onBackPressed()
     }
 
     override fun onClick(view: View) {

@@ -3,18 +3,17 @@ package com.huangxiaowei.wanandroid.ui.fragment
 import android.os.Bundle
 import android.util.ArrayMap
 import android.view.View
-import androidx.fragment.app.Fragment
+import com.huangxiaowei.baselib.ui.fragment.BaseFragment
+import com.huangxiaowei.baselib.ui.fragment.BaseMainFragment
+import com.huangxiaowei.baselib.ui.fragment.FragmentCtrl
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.client.RequestCtrl
 import com.huangxiaowei.wanandroid.globalStatus.LoginStateManager
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.ui.BaseFragment
-import com.huangxiaowei.wanandroid.ui.BaseMainFragment
 import com.huangxiaowei.wanandroid.ui.fragment.userFragment.CoinCountDetailsFragment
 import com.huangxiaowei.wanandroid.ui.fragment.userFragment.CollectArticlesFragment
 import com.huangxiaowei.wanandroid.ui.fragment.userFragment.TODOFragment
 import com.huangxiaowei.wanandroid.ui.fragment.userFragment.UserMainFragment
-import com.huangxiaowei.wanandroid.utils.Logger
 
 class UserFragment: BaseMainFragment(),View.OnClickListener{
     override fun onCreated(view: View, savedInstanceState: Bundle?) {}
@@ -28,8 +27,7 @@ class UserFragment: BaseMainFragment(),View.OnClickListener{
         list[TAG_USER_LOGIN] = LoginFragment()
 
         return FragmentCtrl.ConfigBuilder()
-            .addList(list)
-            .mainFragment(TAG_USER_MAIN)
+            .init(R.id.fragmentContainer,list, TAG_USER_MAIN)
             .build()
     }
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
-import com.bumptech.glide.Glide
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.WebActivity
 import com.huangxiaowei.wanandroid.adaptor.ArticleListAdapter
@@ -14,7 +13,6 @@ import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerBean
 import com.huangxiaowei.wanandroid.data.bean.bannerBean.BannerItem
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.ui.view.BaseArticleFragment
 import com.youth.banner.Banner
 import com.youth.banner.indicator.CircleIndicator
 import kotlinx.android.synthetic.main.include_article_list.*

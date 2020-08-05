@@ -17,8 +17,7 @@ import com.huangxiaowei.wanandroid.data.bean.articleListBean.ArticleListBean
 import com.huangxiaowei.wanandroid.data.bean.hotKeyBean.HotKeyBean
 import com.huangxiaowei.wanandroid.data.litepal.SearchHistoryBean
 import com.huangxiaowei.wanandroid.showToast
-import com.huangxiaowei.wanandroid.ui.view.BaseArticleFragment
-import com.huangxiaowei.wanandroid.utils.SoftKeyboardUtils
+import com.huangxiaowei.baselib.utils.SoftKeyboardUtils
 import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.include_article_list.*
 import org.litepal.LitePal

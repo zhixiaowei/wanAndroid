@@ -2,15 +2,14 @@ package com.huangxiaowei.wanandroid.adaptor
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Size
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.huangxiaowei.baselib.maintain.Logger
 import com.huangxiaowei.wanandroid.R
 import com.huangxiaowei.wanandroid.data.litepal.SearchHistoryBean
-import com.huangxiaowei.wanandroid.utils.Logger
 
 class HistoryAdapter(private val ct:Context,private val list:ArrayList<SearchHistoryBean>): CommonAdapter<SearchHistoryBean>(ct,list) {
 
